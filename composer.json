@@ -1,0 +1,10 @@
+{
+    "name": "code-verse-unity/car-sales-management",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require": {}
+}
