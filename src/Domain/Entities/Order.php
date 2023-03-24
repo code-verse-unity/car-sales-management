@@ -11,8 +11,8 @@ abstract class Order implements EntityInterface
   const ID_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 
   private string $id;
-  private string $clientId;
-  private string $carId;
+  private Client $client;
+  private Car $car;
   private int $quantity;
 
   private DateTime $createdAt;
@@ -21,13 +21,13 @@ abstract class Order implements EntityInterface
   private array $errors;
   private bool $locked;
 
-  public function __construct($id, string $clientId, string $carId, int $quantity,  DateTime $createdAt, DateTime $updatedAt)
+  public function __construct($id, Client $client, Car $car, int $quantity, DateTime $createdAt, DateTime $updatedAt)
   {
     $this->id = $this->validateId($id);
 
     $this->quantity = $quantity;
-    $this->clientId = $clientId;
-    $this->carId = $carId;
+    $this->client = $client;
+    $this->car = $car;
 
     $this->createdAt = $createdAt;
     $this->updatedAt = $updatedAt;
@@ -48,17 +48,39 @@ abstract class Order implements EntityInterface
     return $this->quantity;
   }
 
-  public function getClientId()
-  {
-    return $this->clientId;
+  public function setQuantity($quantity) {
+    if ($this->locked) {
+      throw new Exception("instance locked");
+    }
+
+    $this->quantity = $quantity;
+    $this->triggerUpdate();
   }
 
+  private function triggerUpdate()
+  {
+    $this->updatedAt = new DateTime();
+  }
+
+  public function getClientId()
+  {
+    return $this->client->getId();
+  }
+
+  public function getClient()
+  {
+    return $this->client;
+  }
 
   public function getCarId()
   {
-    return $this->carId;
+    return $this->car->getId();
   }
 
+  public function getCar()
+  {
+    return $this->car;
+  }
 
   public function getCreatedAt()
   {
@@ -75,7 +97,9 @@ abstract class Order implements EntityInterface
     return [
       "id" => $this->getId(),
       "clientId" => $this->getClientId(),
+      "client" => $this->getClient()->getRaw(),
       "carId" => $this->getClientId(),
+      "car" => $this->car->getRaw(),
       "quantity" => $this->getQuantity(),
       "createdAt" => $this->getCreatedAt(),
       "updatedAt" => $this->getUpdatedAt()
@@ -85,6 +109,8 @@ abstract class Order implements EntityInterface
   public function lock(): void
   {
     $this->locked = true;
+    $this->client->lock();
+    $this->car->lock();
   }
 
   public function isLocked(): bool
