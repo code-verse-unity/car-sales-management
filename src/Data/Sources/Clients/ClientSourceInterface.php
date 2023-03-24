@@ -10,4 +10,5 @@ interface ClientSourceInterface
     public function findById(string $id): ClientModel;
     public function findByName(string $name): array;
     public function save(string $id, string $name, string $contact, string $createdAt, string $updatedAt): void;
+    public function update(string $id, string $name, string $contact, string $createdAt, string $updatedAt): void;
 }
