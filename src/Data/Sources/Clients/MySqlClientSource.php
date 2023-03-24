@@ -68,4 +68,17 @@ class MySqlClientSource implements ClientSourceInterface
 
         $statement->execute();
     }
+
+    public function update(string $id, string $name, string $contact, string $createdAt, string $updatedAt): void
+    {
+        $statement = $this->pdo->prepare("UPDATE " . ClientModel::TABLE_NAME . " SET name = :name, contact = :contact, createdAt = :createdAt, updatedAt = :updatedAt WHERE id = :id;");
+
+        $statement->bindValue("id", $id);
+        $statement->bindValue("name", $name);
+        $statement->bindValue("contact", $contact);
+        $statement->bindValue("createdAt", $createdAt);
+        $statement->bindValue("updatedAt", $updatedAt);
+
+        $statement->execute();
+    }
 }
