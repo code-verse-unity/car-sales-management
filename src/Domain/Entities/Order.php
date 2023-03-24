@@ -5,28 +5,29 @@ namespace App\Domain\Entities;
 use DateTime;
 use Exception;
 
-abstract class Car implements EntityInterface
+abstract class Order implements EntityInterface
 {
   const ID_LENGTH = 21;
   const ID_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 
   private string $id;
-  private string $name;
+  private string $clientId;
+  private string $carId;
+  private int $quantity;
+
   private DateTime $createdAt;
   private DateTime $updatedAt;
-  private int $price;
-  private int $inStock;
 
   private array $errors;
   private bool $locked;
 
-  public function __construct($id, string $name, int $price, int $inStock, DateTime $createdAt, DateTime $updatedAt)
+  public function __construct($id, string $clientId, string $carId, int $quantity,  DateTime $createdAt, DateTime $updatedAt)
   {
     $this->id = $this->validateId($id);
 
-    $this->name = $name;
-    $this->price = $price;
-    $this->inStock = $inStock;
+    $this->quantity = $quantity;
+    $this->clientId = $clientId;
+    $this->carId = $carId;
 
     $this->createdAt = $createdAt;
     $this->updatedAt = $updatedAt;
@@ -42,20 +43,22 @@ abstract class Car implements EntityInterface
     return $this->id;
   }
 
-  public function getName()
+  public function getQuantity()
   {
-    return $this->name;
+    return $this->quantity;
   }
 
-  public function getPrice()
+  public function getClientId()
   {
-    return $this->price;
+    return $this->clientId;
   }
 
-  public function getInStock()
+
+  public function getCarId()
   {
-    return $this->inStock;
+    return $this->carId;
   }
+
 
   public function getCreatedAt()
   {
@@ -71,9 +74,9 @@ abstract class Car implements EntityInterface
   {
     return [
       "id" => $this->getId(),
-      "name" => $this->getName(),
-      "price" => $this->getPrice(),
-      "inStock" => $this->getInStock(),
+      "clientId" => $this->getClientId(),
+      "carId" => $this->getClientId(),
+      "quantity" => $this->getQuantity(),
       "createdAt" => $this->getCreatedAt(),
       "updatedAt" => $this->getUpdatedAt()
     ];
