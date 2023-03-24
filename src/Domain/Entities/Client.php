@@ -66,6 +66,7 @@ abstract class Client implements EntityInterface
     return [
       "id" => $this->getId(),
       "name" => $this->getName(),
+      "contact" => $this->getContact(),
       "createdAt" => $this->getCreatedAt(),
       "updatedAt" => $this->getUpdatedAt()
     ];
