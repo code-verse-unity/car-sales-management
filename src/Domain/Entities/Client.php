@@ -174,7 +174,8 @@ abstract class Client implements EntityInterface
       "name" => $this->getName(),
       "contact" => $this->getContact(),
       "createdAt" => $this->getCreatedAt(),
-      "updatedAt" => $this->getUpdatedAt()
+      "updatedAt" => $this->getUpdatedAt(),
+      "errors" => $this->getErrors(), // also add errors as raw
     ];
   }
 
