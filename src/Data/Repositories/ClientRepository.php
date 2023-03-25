@@ -7,7 +7,7 @@ use App\Data\Models\ClientModel;
 use App\Data\Sources\Clients\ClientSourceInterface;
 use App\Domain\Repositories\ClientRepositoryInterface;
 
-class UserRepository implements ClientRepositoryInterface
+class ClientRepository implements ClientRepositoryInterface
 {
     private ClientSourceInterface $source;
 
