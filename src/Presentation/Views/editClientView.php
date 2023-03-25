@@ -1,5 +1,9 @@
 <?php
-
+/* 
+This file is named editClientView instead of updateClientView because
+the EditClientController (Not implemented yet) use it for its main purpose (editing a client)
+But UpdateClientController can also use it
+*/
 ?>
 
 <form action="<?= "/clients/" . $client["id"] ?>" method="POST">
