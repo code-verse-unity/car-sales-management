@@ -52,8 +52,12 @@ $app->router->post("/users", [$storeUserController, "execute"]);
 
 $app->router->get("/clients", [$indexClientController, "execute"]);
 $app->router->post("/clients", [$storeClientController, "execute"]);
-$app->router->put("/clients", [$updateClientController, "execute"]);
 
-
+/*
+This is the path to update a client,
+The clientId is automatically in $request->params.
+So there is no need to add id in the body of the request, it won't be used
+*/
+$app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
 
 $app->run();

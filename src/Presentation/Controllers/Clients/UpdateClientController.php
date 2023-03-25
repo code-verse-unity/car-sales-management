@@ -23,8 +23,13 @@ class UpdateClientController
   {
 
     $body = $request->body;
+    $params = $request->params;
 
-    $useCaseResult = $this->updateClientUseCase->execute($body['id'], $body['name'], $body['contact']);
+    $useCaseResult = $this->updateClientUseCase->execute(
+      $params['clientId'], // the clientId is from $request->params
+      $body['name'],
+      $body['contact']
+    );
 
     if ($useCaseResult instanceof Failure) {
       $response->setStatusCode($useCaseResult->getStatusCode());
