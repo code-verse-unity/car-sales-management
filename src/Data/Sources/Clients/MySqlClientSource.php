@@ -2,6 +2,7 @@
 
 namespace App\Data\Sources\Clients;
 
+use App\Core\Utils\Failures\NotFoundFailure;
 use App\Data\Sources\Clients\ClientSourceInterface;
 use App\Data\Models\ClientModel;
 use PDO;
@@ -23,7 +24,7 @@ class MySqlClientSource implements ClientSourceInterface
         $statement->execute();
         $clientFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
         return array_map(function ($client) {
-          return new ClientModel($client["id"], $client["name"], $client["contact"], $client["createdAt"], $client["updatedAt"]);
+            return new ClientModel($client["id"], $client["name"], $client["contact"], $client["createdAt"], $client["updatedAt"]);
         }, $clientFetched);
     }
 
@@ -34,9 +35,8 @@ class MySqlClientSource implements ClientSourceInterface
         $statement->execute();
         $fetched = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        // TODO throw new NotFoundException
         if (empty($fetched)) {
-            throw new \Exception();
+            throw new NotFoundFailure("The client with id $id is not found.");
         }
 
         $client = $fetched[0];
