@@ -22,7 +22,7 @@ class UpdateClientUseCase
   {
     try {
       // we get an intance of Client, otherwise an NotFoundFailure will be thrown
-      $client = $this->repository->findById($id);
+      $client = $this->clientRepository->findById($id);
       
       // we use the setters, updatedAt will be updated automatically
       $client->setName($name);
