@@ -17,7 +17,7 @@ abstract class Client implements EntityInterface
   private DateTime $updatedAt;
 
   private array $errors;
-  private bool $locked;
+  private bool $locked = false;
 
   public function __construct($id, string $name, string $contact, DateTime $createdAt, DateTime $updatedAt)
   {
