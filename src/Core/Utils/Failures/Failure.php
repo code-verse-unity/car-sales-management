@@ -23,7 +23,7 @@ const DEFAULT_FAILURE_MESSAGES = [
  */
 abstract class Failure extends Exception
 {
-  const DEFAULT_VIEW = "_404";
+  const DEFAULT_VIEW = "_500";
   protected $privateMessage;
   protected $privacy;
   protected $dateTime;
