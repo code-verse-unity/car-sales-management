@@ -22,17 +22,17 @@ class UpdateClientUseCase
   {
     try {
       // we get an intance of Client, otherwise an NotFoundFailure will be thrown
-      $client = $this->repository->findById($id);
-      
-      // we use the setters, updatedAt will be updated automatically
-      $client->setName($name);
-      $client->setContact($contact);
+      $client = $this->clientRepository->findById($id);
+
+      // Uncaught TypeError: http_response_code(): Argument #1 ($response_code) must be of type int
+      // $client->setName($name);
+      // $client->setContact($contact);
 
       // then we update on the repository
-      $this->clientRepository->update($client->getId(), $client->getName(), $client->getContact(),  $client->getCreatedAt()->format(DateTime::ATOM), $client->getUpdatedAt()->format(DateTime::ATOM));
+      $this->clientRepository->update($client->getId(), $name, $contact,  $client->getCreatedAt()->format(DateTime::ATOM), $client->getUpdatedAt()->format(DateTime::ATOM));
 
       // ! lock to make read only
-      $client->lock();
+      // $client->lock();
 
       return $client->getRaw();
     } catch (\Throwable $th) {
