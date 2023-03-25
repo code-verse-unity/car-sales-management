@@ -45,11 +45,35 @@ abstract class Client implements EntityInterface
     return $this->name;
   }
 
+  public function setName($name)
+  {
+    if ($this->locked) {
+      throw new Exception("instance locked");
+    }
+
+    $this->name = $name;
+    $this->triggerUpdate();
+  }
+
+  private function triggerUpdate()
+  {
+    $this->updatedAt = new DateTime();
+  }
+
   public function getContact()
   {
     return $this->contact;
   }
 
+  public function setContact($contact)
+  {
+    if ($this->locked) {
+      throw new Exception("instance locked");
+    }
+
+    $this->contact = $contact;
+    $this->triggerUpdate();
+  }
 
   public function getCreatedAt()
   {
@@ -66,6 +90,7 @@ abstract class Client implements EntityInterface
     return [
       "id" => $this->getId(),
       "name" => $this->getName(),
+      "contact" => $this->getContact(),
       "createdAt" => $this->getCreatedAt(),
       "updatedAt" => $this->getUpdatedAt()
     ];

@@ -47,14 +47,48 @@ abstract class Car implements EntityInterface
     return $this->name;
   }
 
+  public function setName($name)
+  {
+    if ($this->locked) {
+      throw new Exception("instance locked");
+    }
+
+    $this->name = $name;
+  }
+
   public function getPrice()
   {
     return $this->price;
   }
 
+  public function setPrice($price)
+  {
+    if ($this->locked) {
+      throw new Exception("instance locked");
+    }
+
+    $this->price = $price;
+    $this->triggerUpdate();
+  }
+
+  public function triggerUpdate()
+  {
+    $this->updatedAt = new DateTime();
+  }
+
   public function getInStock()
   {
     return $this->inStock;
+  }
+
+  public function setInStock($inStock)
+  {
+    if ($this->locked) {
+      throw new Exception("instance locked");
+    }
+
+    $this->inStock = $inStock;
+    $this->triggerUpdate();
   }
 
   public function getCreatedAt()
