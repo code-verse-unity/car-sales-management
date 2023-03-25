@@ -23,7 +23,9 @@ class MySqlClientSource implements ClientSourceInterface
         $statement->execute();
         $clientFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
         return array_map(function ($client) {
-            return new ClientModel($client["id"], $client["name"], $client["contact"], $client["createdAt"], $client["updatedAt"]);
+            $client =
+                new ClientModel($client["id"], $client["name"], $client["contact"], $client["createdAt"], $client["updatedAt"]);
+            return $client->getRaw();
         }, $clientFetched);
     }
 
