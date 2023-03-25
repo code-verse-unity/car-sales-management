@@ -21,8 +21,14 @@ class UpdateClientUseCase
   public function execute($id, $name, $contact)
   {
     try {
-      $client = new ClientModel($id, $name, $contact, null, null, null);
+      // we get an intance of Client, otherwise an NotFoundFailure will be thrown
+      $client = $this->repository->findById($id);
+      
+      // we use the setters, updatedAt will be updated automatically
+      $client->setName($name);
+      $client->setContact($contact);
 
+      // then we update on the repository
       $this->clientRepository->update($client->getId(), $client->getName(), $client->getContact(),  $client->getCreatedAt()->format(DateTime::ATOM), $client->getUpdatedAt()->format(DateTime::ATOM));
 
       // ! lock to make read only
