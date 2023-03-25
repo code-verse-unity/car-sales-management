@@ -31,10 +31,10 @@ class UpdateClientUseCase
       /*
       since there is no exception thrown if there is a bad request,
       we check if there is an error
-      If true, we update it,
+      If there is no error, we update it on the repository,
       Otherwise we just the return it, and the controller handle the errors
       */
-      if ($client->hasErrors()) {
+      if (!$client->hasErrors()) {
         // then we update on the repository
         $this->clientRepository->update(
           $client->getId(),
