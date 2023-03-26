@@ -9,7 +9,7 @@ class ClientModel extends Client
 {
   const TABLE_NAME = "clients";
 
-  public function __construct($id, string $name, string $contact, $createdAt, $updatedAt)
+  public function __construct($id, $name, $contact, $createdAt, $updatedAt)
   {
     $now = (new DateTime())->getTimestamp();
 
