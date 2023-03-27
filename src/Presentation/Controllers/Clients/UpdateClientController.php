@@ -26,7 +26,7 @@ class UpdateClientController
     $params = $request->params;
 
     $useCaseResult = $this->updateClientUseCase->execute(
-      $params['clientId'], // the clientId is from $request->params
+      $params['clientId'],
       $body['name'],
       $body['contact']
     );
