@@ -20,7 +20,7 @@ class ServerFailure extends Failure
 
   public function getStatusCode()
   {
-    return self::DEFAULT_VIEW;
+    return self::STATUS_CODE;
   }
 
   public function getStatusText()

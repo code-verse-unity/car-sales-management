@@ -16,7 +16,12 @@ class Request
 
         if (in_array($this->getMethod(), ["POST", "PUT", "PATCH", "DELETE"])) {
             $this->query = $this->sanitizeGetData($_GET);
-            $this->body = $this->sanitizePostData($_POST);
+
+            if ($this->getMethod() === 'PUT') {
+                $this->body = $this->getPutBody();;
+            } else {
+                $this->body = $this->sanitizePostData($_POST);
+            }
         }
     }
 
@@ -60,5 +65,24 @@ class Request
     public function getURI()
     {
         return $_SERVER["uri"];
+    }
+
+    function getPutBody()
+    {
+        $rawBody = file_get_contents('php://input');
+        $formatedBody = array();
+
+        if (!empty($rawBody)) {
+            $params = explode('&', $rawBody);
+
+            foreach ($params as $param) {
+                $param_array = explode('=', $param);
+                if (count($param_array) === 2) {
+                    $formatedBody[urldecode($param_array[0])] = urldecode($param_array[1]);
+                }
+            }
+        }
+
+        return $formatedBody;
     }
 }
