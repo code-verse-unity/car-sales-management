@@ -14,12 +14,14 @@ use App\Data\UseCases\Clients\IndexClientUseCase;
 use App\Data\UseCases\Clients\StoreClientUseCase;
 use App\Data\UseCases\Clients\UpdateClientUseCase;
 use App\Data\UseCases\Cars\StoreCarUseCase;
+use App\Data\UseCases\Cars\ShowCarUseCase;
 use App\Data\UseCases\Users\StoreUserUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
 use App\Presentation\Controllers\Users\StoreUserController;
 use App\Presentation\Controllers\Cars\StoreCarController;
+use App\Presentation\Controllers\Cars\ShowCarController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -56,6 +58,9 @@ $carRepository = new CarRepository($mySqlCarSource);
 // StoreCarUseCase and StoreCarController
 $storeCarUseCase = new StoreCarUseCase($carRepository);
 $storeCarController = new StoreCarController($storeCarUseCase);
+// ShowCarUseCase and ShowCarController
+$showCarUseCase = new ShowCarUseCase($carRepository);
+$showCarController = new ShowCarController($showCarUseCase);
 
 $app = new Application();
 
@@ -73,5 +78,6 @@ $app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
 
 // Car routes
 $app->router->post("/cars", [$storeCarController, "execute"]);
+$app->router->get("/cars/{carId}", [$showCarController, "execute"]);
 
 $app->run();

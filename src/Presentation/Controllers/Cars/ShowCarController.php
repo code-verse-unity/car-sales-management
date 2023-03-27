@@ -7,26 +7,24 @@ use App\Core\Responses\Response;
 use App\Core\Utils\Failures\Failure;
 use App\Core\Utils\Failures\NotFoundFailure;
 use App\Core\Utils\Failures\ServerFailure;
-use App\Data\UseCases\Cars\StoreCarUseCase;
+use App\Data\UseCases\Cars\ShowCarUseCase;
 
-class StoreCarController
+class ShowCarController
 {
-    private StoreCarUseCase $storeCarUseCase;
+    private ShowCarUseCase $showCarUseCase;
 
-    public function __construct(StoreCarUseCase $storeCarUseCase)
+    public function __construct(ShowCarUseCase $showCarUseCase)
     {
-        $this->storeCarUseCase = $storeCarUseCase;
+        $this->showCarUseCase = $showCarUseCase;
     }
 
     public function execute(Request $request, Response $response)
     {
 
-        $body = $request->body;
+        $params = $request->params;
 
-        $useCaseResult = $this->storeCarUseCase->execute(
-            $body["name"],
-            $body["price"],
-            $body["inStock"]
+        $useCaseResult = $this->showCarUseCase->execute(
+            $params["carId"],
         );
 
         if ($useCaseResult instanceof Failure) {
@@ -49,16 +47,12 @@ class StoreCarController
         } else {
             $car = $useCaseResult;
 
-            if (empty($car["errors"])) {
-                $response->redirect("/cars/" . $car["id"]);
-            } else {
-                $response->renderView(
-                    "createCarView",
-                    [
-                        "car" => $car
-                    ]
-                );
-            }
+            $response->renderView(
+                "showCarView",
+                [
+                    "car" => $car
+                ]
+            );
         }
     }
 }

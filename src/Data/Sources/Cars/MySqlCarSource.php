@@ -2,6 +2,7 @@
 
 namespace App\Data\Sources\Cars;
 
+use App\Core\Utils\Failures\NotFoundFailure;
 use App\Data\Sources\Cars\CarSourceInterface;
 use App\Data\Models\CarModel;
 use PDO;
@@ -34,9 +35,8 @@ class MySqlCarSource implements CarSourceInterface
         $statement->execute();
         $fetched = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        // TODO throw new NotFoundException
         if (empty($fetched)) {
-            throw new \Exception();
+            throw new NotFoundFailure();
         }
 
         $car = $fetched[0];
