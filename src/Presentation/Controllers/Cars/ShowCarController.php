@@ -23,6 +23,12 @@ class ShowCarController
 
         $params = $request->params;
 
+        /*
+        ? idea:
+        - add list of all orders with this car
+        - show all income from the orders
+        */
+
         $useCaseResult = $this->showCarUseCase->execute(
             $params["carId"],
         );
