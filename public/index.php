@@ -2,20 +2,24 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
-use App\Core\Applications\Application;
-use App\Data\Repositories\ClientRepository;
 use Dotenv\Dotenv;
-use App\Data\Sources\Users\MysqlUserSource;
+use App\Core\Applications\Application;
+use App\Data\Repositories\CarRepository;
 use App\Data\Repositories\UserRepository;
+use App\Data\Repositories\ClientRepository;
+use App\Data\Sources\Users\MysqlUserSource;
+use App\Data\Sources\Cars\MySqlCarSource;
 use App\Data\Sources\Clients\MySqlClientSource;
 use App\Data\UseCases\Clients\IndexClientUseCase;
 use App\Data\UseCases\Clients\StoreClientUseCase;
 use App\Data\UseCases\Clients\UpdateClientUseCase;
+use App\Data\UseCases\Cars\StoreCarUseCase;
 use App\Data\UseCases\Users\StoreUserUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
 use App\Presentation\Controllers\Users\StoreUserController;
+use App\Presentation\Controllers\Cars\StoreCarController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -45,6 +49,13 @@ $storeClientController = new StoreClientController($storeClientUseCase);
 $updateClientUseCase = new UpdateClientUseCase($clientRepository);
 $updateClientController = new UpdateClientController($updateClientUseCase);
 
+// Car
+// Source and repository
+$mySqlCarSource = new MySqlCarSource($pdo);
+$carRepository = new CarRepository($mySqlCarSource);
+// StoreCarUseCase and StoreCarController
+$storeCarUseCase = new StoreCarUseCase($carRepository);
+$storeCarController = new StoreCarController($storeCarUseCase);
 
 $app = new Application();
 
@@ -59,5 +70,8 @@ The clientId is automatically in $request->params.
 So there is no need to add id in the body of the request, it won't be used
 */
 $app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
+
+// Car routes
+$app->router->post("/cars", [$storeCarController, "execute"]);
 
 $app->run();
