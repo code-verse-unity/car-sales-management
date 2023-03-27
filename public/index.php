@@ -15,6 +15,7 @@ use App\Data\UseCases\Clients\StoreClientUseCase;
 use App\Data\UseCases\Clients\UpdateClientUseCase;
 use App\Data\UseCases\Cars\StoreCarUseCase;
 use App\Data\UseCases\Cars\ShowCarUseCase;
+use App\Data\UseCases\Cars\IndexCarUseCase;
 use App\Data\UseCases\Users\StoreUserUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
@@ -23,6 +24,7 @@ use App\Presentation\Controllers\Users\StoreUserController;
 use App\Presentation\Controllers\Cars\StoreCarController;
 use App\Presentation\Controllers\Cars\ShowCarController;
 use App\Presentation\Controllers\Cars\CreateCarController;
+use App\Presentation\Controllers\Cars\IndexCarController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -64,6 +66,9 @@ $showCarUseCase = new ShowCarUseCase($carRepository);
 $showCarController = new ShowCarController($showCarUseCase);
 // CreateCarController
 $createCarController = new CreateCarController();
+// IndexCarUseCase and IndexCarController
+$indexCarUseCase = new IndexCarUseCase($carRepository);
+$indexCarController = new IndexCarController($indexCarUseCase);
 
 $app = new Application();
 
@@ -81,6 +86,7 @@ $app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
 
 // Car routes
 // change POST /cars to POST /cars/create to make getting the form page and posting it to the same path, only the method differs
+$app->router->get("/cars", [$indexCarController, "execute"]); // with search functionality
 $app->router->post("/cars/create", [$storeCarController, "execute"]);
 $app->router->get("/cars/create", [$createCarController, "execute"]);
 $app->router->get("/cars/{carId}", [$showCarController, "execute"]);
