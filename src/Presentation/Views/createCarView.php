@@ -1,5 +1,5 @@
 <?php
-
+// ! be aware, $car can exists or not, depending on the controller that uses this view
 ?>
 
 <form action="<?= "/cars/create" ?>" method="POST">

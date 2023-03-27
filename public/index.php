@@ -22,6 +22,7 @@ use App\Presentation\Controllers\Clients\UpdateClientController;
 use App\Presentation\Controllers\Users\StoreUserController;
 use App\Presentation\Controllers\Cars\StoreCarController;
 use App\Presentation\Controllers\Cars\ShowCarController;
+use App\Presentation\Controllers\Cars\CreateCarController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -61,6 +62,8 @@ $storeCarController = new StoreCarController($storeCarUseCase);
 // ShowCarUseCase and ShowCarController
 $showCarUseCase = new ShowCarUseCase($carRepository);
 $showCarController = new ShowCarController($showCarUseCase);
+// CreateCarController
+$createCarController = new CreateCarController();
 
 $app = new Application();
 
@@ -77,7 +80,9 @@ So there is no need to add id in the body of the request, it won't be used
 $app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
 
 // Car routes
-$app->router->post("/cars", [$storeCarController, "execute"]);
+// change POST /cars to POST /cars/create to make getting the form page and posting it to the same path, only the method differs
+$app->router->post("/cars/create", [$storeCarController, "execute"]);
+$app->router->get("/cars/create", [$createCarController, "execute"]);
 $app->router->get("/cars/{carId}", [$showCarController, "execute"]);
 
 $app->run();
