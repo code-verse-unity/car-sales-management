@@ -23,8 +23,13 @@ class UpdateClientController
   {
 
     $body = $request->body;
+    $params = $request->params;
 
-    $useCaseResult = $this->updateClientUseCase->execute($body['id'], $body['name'], $body['contact']);
+    $useCaseResult = $this->updateClientUseCase->execute(
+      $params['clientId'],
+      $body['name'],
+      $body['contact']
+    );
 
     if ($useCaseResult instanceof Failure) {
       $response->setStatusCode($useCaseResult->getStatusCode());
@@ -34,10 +39,27 @@ class UpdateClientController
         $response->renderView("_500", ["fatalError" => $useCaseResult->getRaw()]);
       }
     } else {
-      $indexClientUseCase = new IndexClientUseCase($this->updateClientUseCase->getRepository());
-      $clients = $indexClientUseCase->execute();
+      // now we need to handle bad request failure if there is one
 
-      $response->renderView("clients", ["clients" => $clients]);
+      // just to remind, we have a raw format of the client updated, with the new property errors
+      $client = $useCaseResult;
+
+      if (empty($client["errors"])) {
+        // if there is no bad request error, we keep the flow as it is supposed to be
+        $indexClientUseCase = new IndexClientUseCase($this->updateClientUseCase->getRepository());
+        $clients = $indexClientUseCase->execute();
+
+        $response->renderView("clients", ["clients" => $clients]);
+      } else {
+        // otherwise, we send the back the view for editing the client, with the raw client, its (invalid) values , and errors
+        // the goal is to make an error state on the inputs (input with red border, error message on the bottom...)
+
+        $response->setStatusCode(400); // bad request http code
+
+        $response->renderView("editClientView", [
+          "client" => $client
+        ]);
+      }
     }
   }
 }
