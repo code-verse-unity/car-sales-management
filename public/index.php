@@ -21,6 +21,7 @@ use App\Data\UseCases\Users\StoreUserUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
+use App\Presentation\Controllers\HomeController;
 use App\Presentation\Controllers\Users\StoreUserController;
 use App\Presentation\Controllers\Cars\StoreCarController;
 use App\Presentation\Controllers\Cars\ShowCarController;
@@ -78,6 +79,8 @@ $updateCarController = new UpdateCarController($updateCarUseCase);
 // EditCarController
 $editCarController = new EditCarController($showCarUseCase);
 
+$homeController = new HomeController();
+
 $app = new Application();
 
 $app->router->post("/users", [$storeUserController, "execute"]);
@@ -91,6 +94,7 @@ The clientId is automatically in $request->params.
 So there is no need to add id in the body of the request, it won't be used
 */
 $app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
+$app->router->get('/', [$homeController, 'execute']);
 
 // Car routes
 // change POST /cars to POST /cars/create to make getting the form page and posting it to the same path, only the method differs

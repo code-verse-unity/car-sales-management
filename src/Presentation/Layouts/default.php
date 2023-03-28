@@ -1,5 +1,15 @@
 <?php
 
+
+function activeLink(string $link)
+{
+    $url = $_SERVER['REQUEST_URI'];
+    if ($url === '/' . strtolower($link)) {
+        return "class='nav-link app-nav-link fw-bold'";
+    } else {
+        return  "class='nav-link text-secondary'";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -11,7 +21,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <!-- TODO: How to handle assets -->
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="styles.css">
+
     <title>Document</title>
 </head>
 
@@ -20,10 +31,10 @@
         <div class="col-sm-4 col-8 fw-bold fs-4">Gestion de vente.</div>
         <div class="col">
             <ul class="nav d-flex justify-content-end">
-                <li class="nav-item "><a href="" class="nav-link app-nav-link" aria-current="page">Acceuil</a></li>
-                <li class="nav-item"><a href="" class="nav-link app-nav-link">Clients</a></li>
-                <li class="nav-item"><a href="" class="nav-link app-nav-link">Voitures</a></li>
-                <li class="nav-item"><a href="" class="nav-link app-nav-link">Achats</a></li>
+                <li class="nav-item "><a href="/" <?= activeLink("") ?> aria-current="page">Acceuil</a></li>
+                <li class="nav-item"><a href="/clients" <?= activeLink("Clients") ?>>Clients</a></li>
+                <li class="nav-item"><a href="/voitures" <?= activeLink("Voitures") ?>>Voitures</a></li>
+                <li class="nav-item"><a href="/achats" <?= activeLink("Achats") ?>>Achats</a></li>
             </ul>
         </div>
     </nav>

@@ -1,0 +1,7 @@
+.app-nav-link {
+  color: var(--bs-orange);
+}
+
+.app-nav-link:hover {
+  color: #ff973f;
+}
