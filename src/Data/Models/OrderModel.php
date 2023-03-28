@@ -9,7 +9,7 @@ class OrderModel extends Order
 {
   const TABLE_NAME = "orders";
 
-  public function __construct($id, ClientModel $client, CarModel $car, int $quantity, $createdAt, $updatedAt)
+  public function __construct($id, ClientModel $client, CarModel $car, $quantity, $createdAt, $updatedAt)
   {
     $now = (new DateTime())->getTimestamp();
 
