@@ -184,7 +184,7 @@ abstract class Order implements EntityInterface
 
   public function hasErrors(): bool
   {
-    return count($this->errors) === 1;
+    return count($this->errors) > 0;
   }
 
   public function getErrors(): array
