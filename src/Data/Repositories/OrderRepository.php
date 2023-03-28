@@ -7,7 +7,7 @@ use App\Data\Sources\Orders\OrderSourceInterface;
 use App\Domain\Repositories\OrderRepositoryInterface;
 use DateTime;
 
-class UserRepository implements OrderRepositoryInterface
+class OrderRepository implements OrderRepositoryInterface
 {
     private OrderSourceInterface $source;
 

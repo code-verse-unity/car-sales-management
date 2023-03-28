@@ -24,8 +24,8 @@ class StoreOrderController
         $body = $request->body;
 
         $useCaseResult = $this->storeOrderUseCase->execute(
-            $body["clientId"],
-            $body["carId"],
+            $body["clientId"] ?? "",
+            $body["carId"] ?? "",
             $body["quantity"]
         );
 
@@ -47,14 +47,20 @@ class StoreOrderController
                 );
             }
         } else {
-            $order = $useCaseResult;
+            $order = $useCaseResult["order"];
+            $clients = $useCaseResult["clients"];
+            $cars = $useCaseResult["cars"];
 
             if (empty($order["errors"])) {
                 $response->redirect("/orders"); // redirect to orders list
             } else {
+                $response->setStatusCode(400);
+
                 $response->renderView(
                     "createOrderView",
                     [
+                        "clients" => $clients,
+                        "cars" => $cars,
                         "order" => $order
                     ]
                 );

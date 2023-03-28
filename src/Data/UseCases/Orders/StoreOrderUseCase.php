@@ -32,6 +32,33 @@ class StoreOrderUseCase
     public function execute($clientId, $carId, $quantity)
     {
         try {
+            $clients = $this->clientRepository->findAll();
+            $cars = $this->carRepository->findAll();
+
+            $clientsRaw = array_map(
+                function ($client) {
+                    $client->lock();
+                    return $client->getRaw();
+                },
+                $clients
+            );
+
+            // only get car with one or more inStock
+            $carsFiltered = array_filter(
+                $cars,
+                function ($car) {
+                    return $car->getInStock() > 0;
+                }
+            );
+
+            $carsRaw = array_map(
+                function ($car) {
+                    $car->lock();
+                    return $car->getRaw();
+                },
+                $carsFiltered
+            );
+
             $client = $this->clientRepository->findById($clientId);
             $car = $this->carRepository->findById($carId);
 
@@ -49,11 +76,27 @@ class StoreOrderUseCase
                     $order->getCreatedAt()->format(DateTime::ATOM),
                     $order->getUpdatedAt()->format(DateTime::ATOM)
                 );
+
+                // this shouldn't create errors if the setQuantity and getQuantity are well set
+                // we subtract inStock of the car and save it
+                $car->setInStock($car->getInStock() - $order->getQuantity());
+                $this->carRepository->update(
+                    $car->getId(),
+                    $car->getName(),
+                    $car->getPrice(),
+                    $car->getInStock(),
+                    $car->getCreatedAt()->format(DateTime::ATOM),
+                    $car->getUpdatedAt()->format(DateTime::ATOM)
+                );
             }
 
             $order->lock();
 
-            return $order->getRaw();
+            return [
+                "clients" => $clientsRaw,
+                "cars" => $carsRaw,
+                "order" => $order->getRaw()
+            ];
         } catch (\Throwable $th) {
             if ($th instanceof Failure) {
                 return $th;

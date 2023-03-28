@@ -23,11 +23,6 @@ abstract class Order implements EntityInterface
 
   public function __construct($id, Client $client, Car $car, $quantity, $createdAt, $updatedAt)
   {
-    $this->id = $this->validateId($id);
-    $this->quantity = $this->validateQuantity($quantity);
-    $this->createdAt = $this->validateCreatedAt($createdAt);
-    $this->updatedAt = $this->validateUpdatedAt($updatedAt);
-
     /*
     Client and Car should not have any error,
     but if they have, mostly it's a programmer mistake,
@@ -40,6 +35,14 @@ abstract class Order implements EntityInterface
     if ($car->hasErrors()) {
       throw new ServerFailure();
     }
+
+    $this->client = $client;
+    $this->car = $car;
+
+    $this->id = $this->validateId($id);
+    $this->quantity = $this->validateQuantity($quantity);
+    $this->createdAt = $this->validateCreatedAt($createdAt);
+    $this->updatedAt = $this->validateUpdatedAt($updatedAt);
   }
 
   private function validateId($id)
@@ -96,6 +99,10 @@ abstract class Order implements EntityInterface
 
       if ($quantity_int < 0) {
         $this->addErrorByAttribute("quantity", "La quantité de la voiture doit être un nombre positif.");
+      }
+
+      if ($quantity_int > $this->car->getInStock()) {
+        $this->addErrorByAttribute("quantity", "La quantité de la voiture ne doit pas dépasser le nombre en stock.");
       }
 
       return $quantity_int;
@@ -166,7 +173,7 @@ abstract class Order implements EntityInterface
       "quantity" => $this->getQuantity(),
       "createdAt" => $this->getCreatedAt(),
       "updatedAt" => $this->getUpdatedAt(),
-      "error" => $this->getErrors(),
+      "errors" => $this->getErrors(),
     ];
   }
 
