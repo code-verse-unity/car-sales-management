@@ -22,6 +22,7 @@ use App\Data\UseCases\Cars\UpdateCarUseCase;
 use App\Data\UseCases\Users\StoreUserUseCase;
 use App\Data\UseCases\Orders\CreateOrderUseCase;
 use App\Data\UseCases\Orders\StoreOrderUseCase;
+use App\Data\UseCases\Orders\IndexOrderUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
@@ -34,6 +35,7 @@ use App\Presentation\Controllers\Cars\UpdateCarController;
 use App\Presentation\Controllers\Cars\EditCarController;
 use App\Presentation\Controllers\Orders\StoreOrderController;
 use App\Presentation\Controllers\Orders\CreateOrderController;
+use App\Presentation\Controllers\Orders\IndexOrderController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -94,6 +96,9 @@ $storeOrderController = new StoreOrderController($storeOrderUseCase);
 // CreateOrderUseCase and CreateOrderController
 $createOrderUseCase = new CreateOrderUseCase($clientRepository, $carRepository);
 $createOrderController = new CreateOrderController($createOrderUseCase);
+// IndexOrderUseCase and IndexOrderController
+$indexOrderUseCase = new IndexOrderUseCase($orderRepository);
+$indexOrderController = new IndexOrderController($indexOrderUseCase);
 
 $app = new Application();
 
@@ -120,6 +125,7 @@ $app->router->post("/cars/{carId}/edit", [$updateCarController, "execute"]); // 
 $app->router->get("/cars/{carId}", [$showCarController, "execute"]);
 
 // Order routes
+$app->router->get("/orders", [$indexOrderController, "execute"]);
 $app->router->get("/orders/create", [$createOrderController, "execute"]);
 $app->router->post("/orders/create", [$storeOrderController, "execute"]);
 

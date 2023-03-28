@@ -2,6 +2,7 @@
 
 namespace App\Data\Sources\Orders;
 
+use App\Core\Utils\Failures\NotFoundFailure;
 use App\Data\Sources\Orders\OrderSourceInterface;
 use App\Data\Models\OrderModel;
 use App\Data\Models\ClientModel;
@@ -39,12 +40,18 @@ class MySqlOrderSource implements OrderSourceInterface
         // * we rename some columns since order, client, and car can have the same column name
         $statement = $this->pdo->prepare("
             SELECT
-                $orderTableName.*,
-                $clientTableName.*,
+                $orderTableName.id AS orderId,
+                $orderTableName.clientId,
+                $orderTableName.carId,
+                $orderTableName.quantity,
+                $orderTableName.createdAt,
+                $orderTableName.updatedAt,
                 $clientTableName.name AS clientName,
+                $clientTableName.contact AS clientContact,
                 $clientTableName.createdAt AS clientCreatedAt,
                 $clientTableName.updatedAt AS clientUpdatedAt,
-                $carTableName.*,
+                $carTableName.price AS carPrice,
+                $carTableName.inStock AS carInStock,
                 $carTableName.name AS carName,
                 $carTableName.createdAt AS carCreatedAt,
                 $carTableName.updatedAt AS carUpdatedAt
@@ -70,19 +77,19 @@ class MySqlOrderSource implements OrderSourceInterface
         return array_map(function ($fetched) {
             return (
                 new OrderModel(
-                    $fetched["id"],
+                    $fetched["orderId"],
                     new ClientModel(
                         $fetched["clientId"],
                         $fetched["clientName"],
-                        $fetched["contact"],
+                        $fetched["clientContact"],
                         $fetched["clientCreatedAt"],
                         $fetched["clientUpdatedAt"]
                     ),
                     new CarModel(
                         $fetched["carId"],
                         $fetched["carName"],
-                        $fetched["price"],
-                        $fetched["inStock"],
+                        $fetched["carPrice"],
+                        $fetched["carInStock"],
                         $fetched["carCreatedAt"],
                         $fetched["carUpdatedAt"]
                     ),
@@ -90,7 +97,7 @@ class MySqlOrderSource implements OrderSourceInterface
                     $fetched["createdAt"],
                     $fetched["updatedAt"]
                 )
-            )->getRaw();
+            );
         }, $arrayFetched);
     }
 
@@ -124,9 +131,8 @@ class MySqlOrderSource implements OrderSourceInterface
 
         $fetched = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        // TODO throw new NotFoundException
         if (empty($fetched)) {
-            throw new \Exception();
+            throw new NotFoundFailure();
         }
 
         $order = $fetched[0];
@@ -221,7 +227,7 @@ class MySqlOrderSource implements OrderSourceInterface
         $carTableName = CarModel::TABLE_NAME;
 
         $statement = $this->pdo->prepare(
-        "SELECT
+            "SELECT
             $orderTableName.*,
             $clientTableName.*,
             $clientTableName.name AS clientName,
