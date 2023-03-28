@@ -2,13 +2,12 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
-use App\Data\Repositories\OrderRepository;
-use App\Data\UseCases\Orders\StoreOrderUseCase;
 use Dotenv\Dotenv;
 use App\Core\Applications\Application;
 use App\Data\Repositories\CarRepository;
 use App\Data\Repositories\UserRepository;
 use App\Data\Repositories\ClientRepository;
+use App\Data\Repositories\OrderRepository;
 use App\Data\Sources\Users\MysqlUserSource;
 use App\Data\Sources\Cars\MySqlCarSource;
 use App\Data\Sources\Clients\MySqlClientSource;
@@ -21,6 +20,8 @@ use App\Data\UseCases\Cars\ShowCarUseCase;
 use App\Data\UseCases\Cars\IndexCarUseCase;
 use App\Data\UseCases\Cars\UpdateCarUseCase;
 use App\Data\UseCases\Users\StoreUserUseCase;
+use App\Data\UseCases\Orders\CreateOrderUseCase;
+use App\Data\UseCases\Orders\StoreOrderUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
@@ -32,6 +33,7 @@ use App\Presentation\Controllers\Cars\IndexCarController;
 use App\Presentation\Controllers\Cars\UpdateCarController;
 use App\Presentation\Controllers\Cars\EditCarController;
 use App\Presentation\Controllers\Orders\StoreOrderController;
+use App\Presentation\Controllers\Orders\CreateOrderController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -89,6 +91,9 @@ $orderRepository = new OrderRepository($mySqlOrderSource);
 // StoreOrderUseCase and StoreOrderController
 $storeOrderUseCase = new StoreOrderUseCase($orderRepository, $clientRepository, $carRepository);
 $storeOrderController = new StoreOrderController($storeOrderUseCase);
+// CreateOrderUseCase and CreateOrderController
+$createOrderUseCase = new CreateOrderUseCase($clientRepository, $carRepository);
+$createOrderController = new CreateOrderController($createOrderUseCase);
 
 $app = new Application();
 
@@ -115,6 +120,7 @@ $app->router->post("/cars/{carId}/edit", [$updateCarController, "execute"]); // 
 $app->router->get("/cars/{carId}", [$showCarController, "execute"]);
 
 // Order routes
+$app->router->get("/orders/create", [$createOrderController, "execute"]);
 $app->router->post("/orders/create", [$storeOrderController, "execute"]);
 
 $app->run();

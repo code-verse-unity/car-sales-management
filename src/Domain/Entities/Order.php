@@ -168,7 +168,7 @@ abstract class Order implements EntityInterface
       "id" => $this->getId(),
       "clientId" => $this->getClientId(),
       "client" => $this->getClient()->getRaw(),
-      "carId" => $this->getClientId(),
+      "carId" => $this->getCarId(),
       "car" => $this->getCar()->getRaw(),
       "quantity" => $this->getQuantity(),
       "createdAt" => $this->getCreatedAt(),
