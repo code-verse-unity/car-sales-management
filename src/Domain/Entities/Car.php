@@ -2,39 +2,131 @@
 
 namespace App\Domain\Entities;
 
+use App\Core\Utils\Failures\ServerFailure;
 use DateTime;
-use Exception;
 
 abstract class Car implements EntityInterface
 {
   const ID_LENGTH = 21;
   const ID_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+  const NAME_MIN_LENGTH = 1;
+  const PRICE_MIN_VALUE = 1;
+  const PRICE_CURRENCY_CODE = "MGA";
 
-  private string $id;
-  private string $name;
-  private DateTime $createdAt;
-  private DateTime $updatedAt;
-  private int $price;
-  private int $inStock;
+  private $id;
+  private $name;
+  private $createdAt;
+  private $updatedAt;
+  private $price;
+  private $inStock;
 
-  private array $errors;
-  private bool $locked;
+  private array $errors = [];
+  private bool $locked = false;
 
-  public function __construct($id, string $name, int $price, int $inStock, DateTime $createdAt, DateTime $updatedAt)
+  public function __construct($id, $name, $price, $inStock, $createdAt, $updatedAt)
   {
     $this->id = $this->validateId($id);
-
-    $this->name = $name;
-    $this->price = $price;
-    $this->inStock = $inStock;
-
-    $this->createdAt = $createdAt;
-    $this->updatedAt = $updatedAt;
+    $this->name = $this->validateName($name);
+    $this->price = $this->validatePrice($price);
+    $this->inStock = $this->validateInStock($inStock);
+    $this->createdAt = $this->validateCreatedAt($createdAt);
+    $this->updatedAt = $this->validateUpdatedAt($updatedAt);
   }
 
   private function validateId($id)
   {
+    if (!is_string($id)) {
+      $this->addErrorByAttribute("id", "L'identifiant d'une voiture doit être une chaîne de caractères.");
+    }
+
+    if (strlen($id) !== self::ID_LENGTH) {
+      $this->addErrorByAttribute("id", "L'identifiant d'une voite doit avoir" . self::ID_LENGTH . " caractères.");
+    }
+
+    if (!$this->containsOnlyChars($id, str_split(self::ID_CHARACTERS))) {
+      $this->addErrorByAttribute("id", "L'identifiant d'une voiture contient des caractères non autorisées.");
+    }
+
     return $id;
+  }
+
+  private function validateName($name)
+  {
+    $trimmed = trim($name);
+
+    if (!isset($name) || $name === null || empty($trimmed)) {
+      $this->addErrorByAttribute("name", "Le nom de la voiture est obligatoire.");
+    }
+
+    if (!is_string($name)) {
+      $this->addErrorByAttribute("name", "Le nom de la voiture doit être une chaîne de caractères.");
+    }
+
+    if (strlen($trimmed) < self::NAME_MIN_LENGTH) {
+      $this->addErrorByAttribute("name", "La longueur minimale pour la voiture du client est de " . self::NAME_MIN_LENGTH . " caractères.");
+    }
+
+    return $trimmed;
+  }
+
+  private function validatePrice($price)
+  {
+    if (!isset($price) || $price === null) {
+      $this->addErrorByAttribute("price", "Le prix de la voiture est obligatoire.");
+    }
+
+    if (!is_numeric($price)) { // it accept both int and float
+      $this->addErrorByAttribute("price", "Le prix de la voiture doit être en valeur numérique.");
+
+      return $price; // save even if it is not valid
+    } else {
+      $float_price = floatval($price);
+
+      if ($float_price < self::PRICE_MIN_VALUE) {
+        $this->addErrorByAttribute("price", "Le prix de la voiture doit être au moins " . self::PRICE_MIN_VALUE . " " . self::PRICE_CURRENCY_CODE . ".");
+      }
+
+      return $float_price;
+    }
+  }
+
+  private function validateInStock($inStock)
+  {
+    if (!isset($inStock) || $inStock === null) {
+      $this->addErrorByAttribute("inStock", "Le nombre en stock de la voiture est obligatoire.");
+    }
+
+    if (!is_numeric($inStock)) {
+      $this->addErrorByAttribute("inStock", "Le nombre en stock de la voiture doit être un nombre entier.");
+
+      return $inStock;
+    } else {
+      $inStock_int = intval($inStock);
+
+      if ($inStock_int < 0) {
+        $this->addErrorByAttribute("inStock", "Le nombre en stock de la voiture doit être un nombre positif.");
+      }
+
+      return $inStock_int;
+    }
+  }
+
+  private function validateCreatedAt($createdAt)
+  {
+    if (!$createdAt instanceof Datetime) {
+      $this->addErrorByAttribute("createdAt", "La date de creation de la voiture n'est pas valide.");
+    }
+
+    return $createdAt;
+  }
+
+  private function validateUpdatedAt($updatedAt)
+  {
+    if (!$updatedAt instanceof Datetime) {
+      $this->addErrorByAttribute("updatedAt", "La date de creation de la voiture n'est pas valide.");
+    }
+
+    return $updatedAt;
   }
 
   public function getId()
@@ -50,10 +142,13 @@ abstract class Car implements EntityInterface
   public function setName($name)
   {
     if ($this->locked) {
-      throw new Exception("instance locked");
+      throw new ServerFailure("instance locked");
     }
 
-    $this->name = $name;
+    $this->removeErrorsByAttribute("name");
+    $this->name = $this->validateName($name);
+
+    $this->triggerUpdate();
   }
 
   public function getPrice()
@@ -64,10 +159,12 @@ abstract class Car implements EntityInterface
   public function setPrice($price)
   {
     if ($this->locked) {
-      throw new Exception("instance locked");
+      throw new ServerFailure("instance locked");
     }
 
-    $this->price = $price;
+    $this->removeErrorsByAttribute("price");
+    $this->price = $this->validatePrice($price);
+
     $this->triggerUpdate();
   }
 
@@ -84,7 +181,7 @@ abstract class Car implements EntityInterface
   public function setInStock($inStock)
   {
     if ($this->locked) {
-      throw new Exception("instance locked");
+      throw new ServerFailure("instance locked");
     }
 
     $this->inStock = $inStock;
@@ -109,7 +206,8 @@ abstract class Car implements EntityInterface
       "price" => $this->getPrice(),
       "inStock" => $this->getInStock(),
       "createdAt" => $this->getCreatedAt(),
-      "updatedAt" => $this->getUpdatedAt()
+      "updatedAt" => $this->getUpdatedAt(),
+      "errors" => $this->getErrors()
     ];
   }
 
@@ -125,7 +223,7 @@ abstract class Car implements EntityInterface
 
   public function hasErrors(): bool
   {
-    return count($this->errors) === 1;
+    return count($this->errors) > 0;
   }
 
   public function getErrors(): array
@@ -146,5 +244,30 @@ abstract class Car implements EntityInterface
   public function getFirstError(string $attribute): string
   {
     return $this->errors[$attribute][0];
+  }
+
+  protected function addErrorByAttribute(string $attribute, string $message)
+  {
+    if (array_key_exists($attribute, $this->errors)) {
+      $this->errors[$attribute][] = $message;
+    } else {
+      $this->errors[$attribute] = [$message];
+    }
+  }
+
+  private function containsOnlyChars(string $string, array $allowedChars)
+  {
+    $length = strlen($string);
+    for ($i = 0; $i < $length; $i++) {
+      if (!in_array($string[$i], $allowedChars)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private function removeErrorsByAttribute(string $attribute)
+  {
+    unset($this->errors[$attribute]);
   }
 }

@@ -2,20 +2,32 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
-use App\Core\Applications\Application;
-use App\Data\Repositories\ClientRepository;
 use Dotenv\Dotenv;
-use App\Data\Sources\Users\MysqlUserSource;
+use App\Core\Applications\Application;
+use App\Data\Repositories\CarRepository;
 use App\Data\Repositories\UserRepository;
+use App\Data\Repositories\ClientRepository;
+use App\Data\Sources\Users\MysqlUserSource;
+use App\Data\Sources\Cars\MySqlCarSource;
 use App\Data\Sources\Clients\MySqlClientSource;
 use App\Data\UseCases\Clients\IndexClientUseCase;
 use App\Data\UseCases\Clients\StoreClientUseCase;
 use App\Data\UseCases\Clients\UpdateClientUseCase;
+use App\Data\UseCases\Cars\StoreCarUseCase;
+use App\Data\UseCases\Cars\ShowCarUseCase;
+use App\Data\UseCases\Cars\IndexCarUseCase;
+use App\Data\UseCases\Cars\UpdateCarUseCase;
 use App\Data\UseCases\Users\StoreUserUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
 use App\Presentation\Controllers\Users\StoreUserController;
+use App\Presentation\Controllers\Cars\StoreCarController;
+use App\Presentation\Controllers\Cars\ShowCarController;
+use App\Presentation\Controllers\Cars\CreateCarController;
+use App\Presentation\Controllers\Cars\IndexCarController;
+use App\Presentation\Controllers\Cars\UpdateCarController;
+use App\Presentation\Controllers\Cars\EditCarController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -45,6 +57,26 @@ $storeClientController = new StoreClientController($storeClientUseCase);
 $updateClientUseCase = new UpdateClientUseCase($clientRepository);
 $updateClientController = new UpdateClientController($updateClientUseCase);
 
+// Car
+// Source and repository
+$mySqlCarSource = new MySqlCarSource($pdo);
+$carRepository = new CarRepository($mySqlCarSource);
+// StoreCarUseCase and StoreCarController
+$storeCarUseCase = new StoreCarUseCase($carRepository);
+$storeCarController = new StoreCarController($storeCarUseCase);
+// ShowCarUseCase and ShowCarController
+$showCarUseCase = new ShowCarUseCase($carRepository);
+$showCarController = new ShowCarController($showCarUseCase);
+// CreateCarController
+$createCarController = new CreateCarController();
+// IndexCarUseCase and IndexCarController
+$indexCarUseCase = new IndexCarUseCase($carRepository);
+$indexCarController = new IndexCarController($indexCarUseCase);
+// UpdateCarUseCase and UpdateCarController
+$updateCarUseCase = new UpdateCarUseCase($carRepository);
+$updateCarController = new UpdateCarController($updateCarUseCase);
+// EditCarController
+$editCarController = new EditCarController($showCarUseCase);
 
 $app = new Application();
 
@@ -59,5 +91,15 @@ The clientId is automatically in $request->params.
 So there is no need to add id in the body of the request, it won't be used
 */
 $app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
+
+// Car routes
+// change POST /cars to POST /cars/create to make getting the form page and posting it to the same path, only the method differs
+$app->router->get("/cars", [$indexCarController, "execute"]); // with search functionality
+$app->router->post("/cars/create", [$storeCarController, "execute"]);
+$app->router->get("/cars/create", [$createCarController, "execute"]);
+$app->router->get("/cars/{carId}/edit", [$editCarController, "execute"]);
+$app->router->put("/cars/{carId}/edit", [$updateCarController, "execute"]); // ! this one works on postman, but not in the browser because there is no PUT method from html
+$app->router->post("/cars/{carId}/edit", [$updateCarController, "execute"]); // ! this one can works on both, and doesn't have any collision with other paths, note the POST method
+$app->router->get("/cars/{carId}", [$showCarController, "execute"]);
 
 $app->run();
