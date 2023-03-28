@@ -2,39 +2,60 @@
 
 namespace App\Domain\Entities;
 
+use App\Core\Utils\Failures\ServerFailure;
 use DateTime;
-use Exception;
 
 abstract class Order implements EntityInterface
 {
   const ID_LENGTH = 21;
   const ID_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
 
-  private string $id;
+  private $id;
   private Client $client;
   private Car $car;
-  private int $quantity;
+  private $quantity;
 
-  private DateTime $createdAt;
-  private DateTime $updatedAt;
+  private $createdAt;
+  private $updatedAt;
 
-  private array $errors;
-  private bool $locked;
+  private array $errors = [];
+  private bool $locked = false;
 
-  public function __construct($id, Client $client, Car $car, int $quantity, DateTime $createdAt, DateTime $updatedAt)
+  public function __construct($id, Client $client, Car $car, $quantity, $createdAt, $updatedAt)
   {
     $this->id = $this->validateId($id);
+    $this->quantity = $this->validateQuantity($quantity);
+    $this->createdAt = $this->validateCreatedAt($createdAt);
+    $this->updatedAt = $this->validateUpdatedAt($updatedAt);
 
-    $this->quantity = $quantity;
-    $this->client = $client;
-    $this->car = $car;
+    /*
+    Client and Car should not have any error,
+    but if they have, mostly it's a programmer mistake,
+    so we throw a ServerFailure
+    */
+    if ($client->hasErrors()) {
+      throw new ServerFailure();
+    }
 
-    $this->createdAt = $createdAt;
-    $this->updatedAt = $updatedAt;
+    if ($car->hasErrors()) {
+      throw new ServerFailure();
+    }
   }
 
   private function validateId($id)
   {
+    if (!is_string($id)) {
+      $this->addErrorByAttribute("id", "L'identifiant d'un achat doit être une chaîne de caractères.");
+    }
+
+    if (strlen($id) !== self::ID_LENGTH) {
+      $this->addErrorByAttribute("id", "L'identifiant d'un achat doit avoir" . self::ID_LENGTH . " caractères.");
+    }
+
+    if (!$this->containsOnlyChars($id, str_split(self::ID_CHARACTERS))) {
+      $this->addErrorByAttribute("id", "L'identifiant d'un achat contient des caractères non autorisées.");
+    }
+
     return $id;
   }
 
@@ -48,13 +69,55 @@ abstract class Order implements EntityInterface
     return $this->quantity;
   }
 
-  public function setQuantity($quantity) {
+  public function setQuantity($quantity)
+  {
     if ($this->locked) {
-      throw new Exception("instance locked");
+      throw new ServerFailure("instance locked");
     }
 
-    $this->quantity = $quantity;
+    $this->removeErrorsByAttribute("quantity");
+    $this->quantity = $this->validateQuantity($quantity);
+
     $this->triggerUpdate();
+  }
+
+  private function validateQuantity($quantity)
+  {
+    if (!isset($quantity) || $quantity === null) {
+      $this->addErrorByAttribute("quantity", "La quantité de la voiture est obligatoire.");
+    }
+
+    if (!is_numeric($quantity)) {
+      $this->addErrorByAttribute("quantity", "La quantité de la voiture doit être un nombre entier.");
+
+      return $quantity;
+    } else {
+      $quantity_int = intval($quantity);
+
+      if ($quantity_int < 0) {
+        $this->addErrorByAttribute("quantity", "La quantité de la voiture doit être un nombre positif.");
+      }
+
+      return $quantity_int;
+    }
+  }
+
+  private function validateCreatedAt($createdAt)
+  {
+    if (!$createdAt instanceof Datetime) {
+      $this->addErrorByAttribute("createdAt", "La date de creation de l'achat n'est pas valide.");
+    }
+
+    return $createdAt;
+  }
+
+  private function validateUpdatedAt($updatedAt)
+  {
+    if (!$updatedAt instanceof Datetime) {
+      $this->addErrorByAttribute("updatedAt", "La date de la dernière modification de l'achat n'est pas valide.");
+    }
+
+    return $updatedAt;
   }
 
   private function triggerUpdate()
@@ -99,10 +162,11 @@ abstract class Order implements EntityInterface
       "clientId" => $this->getClientId(),
       "client" => $this->getClient()->getRaw(),
       "carId" => $this->getClientId(),
-      "car" => $this->car->getRaw(),
+      "car" => $this->getCar()->getRaw(),
       "quantity" => $this->getQuantity(),
       "createdAt" => $this->getCreatedAt(),
-      "updatedAt" => $this->getUpdatedAt()
+      "updatedAt" => $this->getUpdatedAt(),
+      "error" => $this->getErrors(),
     ];
   }
 
@@ -141,5 +205,30 @@ abstract class Order implements EntityInterface
   public function getFirstError(string $attribute): string
   {
     return $this->errors[$attribute][0];
+  }
+
+  protected function addErrorByAttribute(string $attribute, string $message)
+  {
+    if (array_key_exists($attribute, $this->errors)) {
+      $this->errors[$attribute][] = $message;
+    } else {
+      $this->errors[$attribute] = [$message];
+    }
+  }
+
+  private function containsOnlyChars(string $string, array $allowedChars)
+  {
+    $length = strlen($string);
+    for ($i = 0; $i < $length; $i++) {
+      if (!in_array($string[$i], $allowedChars)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private function removeErrorsByAttribute(string $attribute)
+  {
+    unset($this->errors[$attribute]);
   }
 }
