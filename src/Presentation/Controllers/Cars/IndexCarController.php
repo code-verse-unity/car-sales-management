@@ -48,7 +48,7 @@ class IndexCarController
             $cars = $useCaseResult;
 
             $response->renderView(
-                "indexCarView",
+                "cars/index",
                 [
                     // pass the name query as nameQuery
                     "nameQuery" => $query["name"] ?? null,
