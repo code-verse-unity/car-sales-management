@@ -12,17 +12,29 @@ abstract class Order implements EntityInterface
 
   private $id;
   private Client $client;
-  private Car $car;
-  private $quantity;
-
+  private array $carsQuantities;
   private $createdAt;
   private $updatedAt;
 
+  /*
+  $errors can have keys: id, createdAt, updatedAt, and carsQuantities
+  carsQuantities is like this:
+  [
+  "mBwSV__ZbkMho_h_yq4Dx" => "La quantité de la voiture ne doit pas dépasser le nombre en stock.",
+  ]
+  with the carId as key and the message as value
+  */
   private array $errors = [];
   private bool $locked = false;
 
-  public function __construct($id, Client $client, Car $car, $quantity, $createdAt, $updatedAt)
-  {
+  public function __construct(
+    $id,
+    Client $client,
+    array $carsQuantities,
+    // associative array with car and quantity as keys
+    $createdAt,
+    $updatedAt
+  ) {
     /*
     Client and Car should not have any error,
     but if they have, mostly it's a programmer mistake,
@@ -32,15 +44,10 @@ abstract class Order implements EntityInterface
       throw new ServerFailure();
     }
 
-    if ($car->hasErrors()) {
-      throw new ServerFailure();
-    }
-
     $this->client = $client;
-    $this->car = $car;
+    $this->carsQuantities = $this->validateCarsQuantities($carsQuantities);
 
     $this->id = $this->validateId($id);
-    $this->quantity = $this->validateQuantity($quantity);
     $this->createdAt = $this->validateCreatedAt($createdAt);
     $this->updatedAt = $this->validateUpdatedAt($updatedAt);
   }
@@ -62,51 +69,106 @@ abstract class Order implements EntityInterface
     return $id;
   }
 
+  public function validateCarsQuantities($carsQuantities)
+  {
+    if (
+      !isset($carsQuantities) ||
+      $carsQuantities === null ||
+      !is_array($carsQuantities)
+    ) {
+      throw new ServerFailure();
+    }
+
+    return array_map(
+      function ($carQuantity) {
+        if (
+          !isset($carQuantity) ||
+          $carQuantity === null ||
+          !is_array($carQuantity) ||
+          !isset($carQuantity["car"]) ||
+          $carQuantity["car"] === null ||
+          !is_array($carQuantity["car"]) ||
+          !isset($carQuantity["quantity"]) ||
+          $carQuantity["quantity"] === null ||
+          !is_array($carQuantity["quantity"])
+        ) {
+          throw new ServerFailure();
+        }
+
+        $car = $carQuantity["car"];
+        $quantity = $carQuantity["quantity"];
+
+        $result = [
+          "car" => $car,
+          "quantity" => $quantity
+        ];
+
+        if (!$car instanceof Car) {
+          throw new ServerFailure();
+        } else if ($car->hasErrors()) {
+          throw new ServerFailure();
+        }
+
+        if (!isset($quantity) || $quantity === null) {
+          $this->addCarQuantityError($car->getId(), "La quantité de la voiture est obligatoire.");
+        }
+
+        if (!is_numeric($quantity)) {
+          $this->addCarQuantityError($car->getId(), "La quantité de la voiture doit être un nombre entier.");
+        } else {
+          $quantity_int = intval($quantity);
+
+          if ($quantity_int < 0) {
+            $this->addCarQuantityError($car->getId(), "La quantité de la voiture doit être un nombre positif.");
+          }
+
+          if ($quantity_int > $car->getInStock()) {
+            $this->addCarQuantityError($car->getId(), "La quantité de la voiture ne doit pas dépasser le nombre en stock.");
+          }
+
+          $result["quantity"] = $quantity_int;
+        }
+
+        return $result;
+      },
+      $carsQuantities
+    );
+  }
+
+  public function getCarsQuantities()
+  {
+    return $this->carsQuantities;
+  }
+
   public function getId()
   {
     return $this->id;
   }
 
-  public function getQuantity()
+  public function getCars(): array
   {
-    return $this->quantity;
+    return array_map(function ($carQuantity) {
+      return $carQuantity["car"];
+    }, $this->carsQuantities);
   }
 
-  public function setQuantity($quantity)
+  public function getQuantities(): array
+  {
+    return array_map(function ($carQuantity) {
+      return $carQuantity["quantity"];
+    }, $this->carsQuantities);
+  }
+
+  public function setCarsQuantities($carsQuantities)
   {
     if ($this->locked) {
       throw new ServerFailure("instance locked");
     }
 
-    $this->removeErrorsByAttribute("quantity");
-    $this->quantity = $this->validateQuantity($quantity);
+    $this->removeCarQuantityErrors();
+    $this->carsQuantities = $this->validateCarsQuantities($carsQuantities);
 
     $this->triggerUpdate();
-  }
-
-  private function validateQuantity($quantity)
-  {
-    if (!isset($quantity) || $quantity === null) {
-      $this->addErrorByAttribute("quantity", "La quantité de la voiture est obligatoire.");
-    }
-
-    if (!is_numeric($quantity)) {
-      $this->addErrorByAttribute("quantity", "La quantité de la voiture doit être un nombre entier.");
-
-      return $quantity;
-    } else {
-      $quantity_int = intval($quantity);
-
-      if ($quantity_int < 0) {
-        $this->addErrorByAttribute("quantity", "La quantité de la voiture doit être un nombre positif.");
-      }
-
-      if ($quantity_int > $this->car->getInStock()) {
-        $this->addErrorByAttribute("quantity", "La quantité de la voiture ne doit pas dépasser le nombre en stock.");
-      }
-
-      return $quantity_int;
-    }
   }
 
   private function validateCreatedAt($createdAt)
@@ -142,14 +204,11 @@ abstract class Order implements EntityInterface
     return $this->client;
   }
 
-  public function getCarId()
+  public function getCarsIds()
   {
-    return $this->car->getId();
-  }
-
-  public function getCar()
-  {
-    return $this->car;
+    return array_map(function ($carQuantity) {
+      return $carQuantity["car"]->getId();
+    }, $this->carsQuantities);
   }
 
   public function getCreatedAt()
@@ -168,9 +227,23 @@ abstract class Order implements EntityInterface
       "id" => $this->getId(),
       "clientId" => $this->getClientId(),
       "client" => $this->getClient()->getRaw(),
-      "carId" => $this->getCarId(),
-      "car" => $this->getCar()->getRaw(),
-      "quantity" => $this->getQuantity(),
+      "carsIds" => $this->getCarsIds(),
+      "cars" => array_map(
+        function ($car) {
+          return $car->getRaw();
+        },
+        $this->getCars()
+      ),
+      "quantities" => $this->getQuantities(),
+      "carsQuantities" => array_map(
+        function ($carQuantity) {
+          return [
+            "quantity" => $carQuantity["quantity"],
+            "car" => $carQuantity["car"]->getRaw()
+          ];
+        },
+        $this->getCarsQuantities()
+      ),
       "createdAt" => $this->getCreatedAt(),
       "updatedAt" => $this->getUpdatedAt(),
       "errors" => $this->getErrors(),
@@ -181,7 +254,9 @@ abstract class Order implements EntityInterface
   {
     $this->locked = true;
     $this->client->lock();
-    $this->car->lock();
+    foreach ($this->carsQuantities as $carQuantity) {
+      $carQuantity["car"]->lock();
+    }
   }
 
   public function isLocked(): bool
@@ -221,6 +296,24 @@ abstract class Order implements EntityInterface
     } else {
       $this->errors[$attribute] = [$message];
     }
+  }
+
+  protected function addCarQuantityError(string $carId, string $message)
+  {
+    if (!array_key_exists("carsQuantities", $this->errors)) {
+      $this->errors["carsQuantities"] = [];
+    }
+
+    if (!array_key_exists($carId, $this->errors["carsQuantities"])) {
+      $this->errors["carsQuantities"][$carId] = [];
+    }
+
+    $this->errors["carsQuantities"][$carId][] = $message;
+  }
+
+  public function removeCarQuantityErrors()
+  {
+    unset($this->errors["carsQuantities"]);
   }
 
   private function containsOnlyChars(string $string, array $allowedChars)
