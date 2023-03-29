@@ -36,7 +36,7 @@ class OrderRepository implements OrderRepositoryInterface
         $this->source->save($id, $clientId, $carsQuantities, $createdAt, $updatedAt);
     }
 
-    public function update(string $id, string $clientId, string $carsQuantities, string $createdAt, string $updatedAt): void
+    public function update(string $id, string $clientId, array $carsQuantities, string $createdAt, string $updatedAt): void
     {
         $this->source->update($id, $clientId, $carsQuantities, $createdAt, $updatedAt);
     }

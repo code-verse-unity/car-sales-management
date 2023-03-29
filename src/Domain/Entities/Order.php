@@ -87,10 +87,8 @@ abstract class Order implements EntityInterface
           !is_array($carQuantity) ||
           !isset($carQuantity["car"]) ||
           $carQuantity["car"] === null ||
-          !is_array($carQuantity["car"]) ||
           !isset($carQuantity["quantity"]) ||
-          $carQuantity["quantity"] === null ||
-          !is_array($carQuantity["quantity"])
+          $carQuantity["quantity"] === null
         ) {
           throw new ServerFailure();
         }
@@ -122,6 +120,8 @@ abstract class Order implements EntityInterface
             $this->addCarQuantityError($car->getId(), "La quantité de la voiture doit être un nombre positif.");
           }
 
+          // ! this can have false positive result because the actual state of the order CAN be not related to the actual state of inStock
+          // ! so this error should be considered only when creating the order
           if ($quantity_int > $car->getInStock()) {
             $this->addCarQuantityError($car->getId(), "La quantité de la voiture ne doit pas dépasser le nombre en stock.");
           }
@@ -238,16 +238,39 @@ abstract class Order implements EntityInterface
       "carsQuantities" => array_map(
         function ($carQuantity) {
           return [
+            "car" => $carQuantity["car"]->getRaw(),
             "quantity" => $carQuantity["quantity"],
-            "car" => $carQuantity["car"]->getRaw()
+            "subtotal" => $carQuantity["car"]->getPrice() * $carQuantity["quantity"],
           ];
         },
         $this->getCarsQuantities()
       ),
+      "subtotals" => $this->getSubtotals(),
+      "total" => $this->getTotal(),
       "createdAt" => $this->getCreatedAt(),
       "updatedAt" => $this->getUpdatedAt(),
       "errors" => $this->getErrors(),
     ];
+  }
+
+  public function getSubtotals()
+  {
+    return array_map(
+      function ($carQuantity) {
+        return $carQuantity["car"]->getPrice() * $carQuantity["quantity"];
+      }, $this->carsQuantities
+    );
+  }
+
+  public function getTotal()
+  {
+    return array_reduce(
+      $this->carsQuantities,
+      function ($prev, $curr) {
+        return $prev + $curr["car"]->getPrice() * $curr["quantity"];
+      },
+      0
+    );
   }
 
   public function lock(): void

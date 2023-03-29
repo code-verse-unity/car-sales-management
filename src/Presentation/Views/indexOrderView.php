@@ -23,18 +23,18 @@
     const form = document.getElementById("index-order-form");
     const basePath = "/orders";
 
-    basePath.addEventListener("submit", (event) => {
+    form.addEventListener("submit", (event) => {
         event.preventDefault();
-        $startAt = startAt.value;
-        $endAt = endAt.value;
+        const startAtValue = startAt.value;
+        const endAtValue = endAt.value;
         let path = basePath + "?";
 
-        if (startAt) {
-            path += `startAt=${startAt}&`;
+        if (startAtValue) {
+            path += `startAt=${startAtValue}&`;
         }
 
-        if (endAt) {
-            path += `endAt=${endAt}&`;
+        if (endAtValue) {
+            path += `endAt=${endAtValue}&`;
         }
 
         window.location.href = path;
@@ -54,8 +54,8 @@
         <?php foreach ($orders as $order): ?>
             <li>
                 <pre>
-                    <?php print_r($order) ?>
-                </pre>
+                            <?php print_r($order) ?>
+                        </pre>
 
                 <a href="<?= "/orders/" . $order["id"] ?>">Voir les détails</a>
             </li>
