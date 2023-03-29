@@ -9,8 +9,13 @@ class OrderModel extends Order
 {
   const TABLE_NAME = "orders";
 
-  public function __construct($id, ClientModel $client, CarModel $car, $quantity, $createdAt, $updatedAt)
-  {
+  public function __construct(
+    $id,
+    ClientModel $client,
+    $carsQuantities,
+    $createdAt,
+    $updatedAt
+  ) {
     $now = (new DateTime())->getTimestamp();
 
     $createdAtValue = new DateTime();
@@ -27,6 +32,12 @@ class OrderModel extends Order
       $updatedAtValue->setTimestamp($now);
     }
 
-    parent::__construct($id, $client, $car, $quantity, new DateTime($createdAt), new DateTime($updatedAt));
+    parent::__construct(
+      $id,
+      $client,
+      $carsQuantities,
+      new DateTime($createdAt),
+      new DateTime($updatedAt)
+    );
   }
 }
