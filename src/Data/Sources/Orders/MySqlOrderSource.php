@@ -172,27 +172,34 @@ class MySqlOrderSource implements OrderSourceInterface
         $clientTableName = ClientModel::TABLE_NAME;
         $carTableName = CarModel::TABLE_NAME;
 
-        $statement = $this->pdo->prepare("
-        SELECT
-            $orderTableName.*,
-            $clientTableName.*,
-            $clientTableName.name AS clientName,
-            $clientTableName.createdAt AS clientCreatedAt,
-            $clientTableName.updatedAt AS clientUpdatedAt,
-            $carTableName.*,
-            $carTableName.name AS carName,
-            $carTableName.createdAt AS carCreatedAt,
-            $carTableName.updatedAt AS carUpdatedAt
-        FROM $orderTableName
-        INNER JOIN $clientTableName
-            ON $orderTableName.clientId = $clientTableName.id
-        INNER JOIN $carTableName
-            ON $orderTableName.carId = $carTableName.id
-        WHERE $clientTableName.id = :clientId
-        ORDER BY
-            $orderTableName.createdAt DESC,
-            $clientTableName.name ASC,
-            $carTableName.name ASC;");
+        $statement = $this->pdo->prepare(
+            "SELECT
+                $orderTableName.id AS orderId,
+                $orderTableName.clientId,
+                $orderTableName.carId,
+                $orderTableName.quantity,
+                $orderTableName.createdAt,
+                $orderTableName.updatedAt,
+                $clientTableName.name AS clientName,
+                $clientTableName.contact AS clientContact,
+                $clientTableName.createdAt AS clientCreatedAt,
+                $clientTableName.updatedAt AS clientUpdatedAt,
+                $carTableName.price AS carPrice,
+                $carTableName.inStock AS carInStock,
+                $carTableName.name AS carName,
+                $carTableName.createdAt AS carCreatedAt,
+                $carTableName.updatedAt AS carUpdatedAt
+            FROM $orderTableName
+            INNER JOIN $clientTableName
+                ON $orderTableName.clientId = $clientTableName.id
+            INNER JOIN $carTableName
+                ON $orderTableName.carId = $carTableName.id
+            WHERE $clientTableName.id = :clientId
+            ORDER BY
+                $orderTableName.createdAt DESC,
+                $clientTableName.name ASC,
+                $carTableName.name ASC;"
+        );
 
         $statement->bindValue("clientId", $clientId);
         $statement->execute();
@@ -202,19 +209,19 @@ class MySqlOrderSource implements OrderSourceInterface
         return array_map(function ($fetched) {
             return (
                 new OrderModel(
-                    $fetched["id"],
+                    $fetched["orderId"],
                     new ClientModel(
                         $fetched["clientId"],
                         $fetched["clientName"],
-                        $fetched["contact"],
+                        $fetched["clientContact"],
                         $fetched["clientCreatedAt"],
                         $fetched["clientUpdatedAt"]
                     ),
                     new CarModel(
                         $fetched["carId"],
                         $fetched["carName"],
-                        $fetched["price"],
-                        $fetched["inStock"],
+                        $fetched["carPrice"],
+                        $fetched["carInStock"],
                         $fetched["carCreatedAt"],
                         $fetched["carUpdatedAt"]
                     ),
@@ -234,25 +241,31 @@ class MySqlOrderSource implements OrderSourceInterface
 
         $statement = $this->pdo->prepare(
             "SELECT
-            $orderTableName.*,
-            $clientTableName.*,
-            $clientTableName.name AS clientName,
-            $clientTableName.createdAt AS clientCreatedAt,
-            $clientTableName.updatedAt AS clientUpdatedAt,
-            $carTableName.*,
-            $carTableName.name AS carName,
-            $carTableName.createdAt AS carCreatedAt,
-            $carTableName.updatedAt AS carUpdatedAt
-        FROM $orderTableName
-        INNER JOIN $clientTableName
-            ON $orderTableName.clientId = $clientTableName.id
-        INNER JOIN $carTableName
-            ON $orderTableName.carId = $carTableName.id
-        WHERE $carTableName.id = :carId
-        ORDER BY
-            $orderTableName.createdAt DESC,
-            $clientTableName.name ASC,
-            $carTableName.name ASC;"
+                $orderTableName.id AS orderId,
+                $orderTableName.clientId,
+                $orderTableName.carId,
+                $orderTableName.quantity,
+                $orderTableName.createdAt,
+                $orderTableName.updatedAt,
+                $clientTableName.name AS clientName,
+                $clientTableName.contact AS clientContact,
+                $clientTableName.createdAt AS clientCreatedAt,
+                $clientTableName.updatedAt AS clientUpdatedAt,
+                $carTableName.price AS carPrice,
+                $carTableName.inStock AS carInStock,
+                $carTableName.name AS carName,
+                $carTableName.createdAt AS carCreatedAt,
+                $carTableName.updatedAt AS carUpdatedAt
+            FROM $orderTableName
+            INNER JOIN $clientTableName
+                ON $orderTableName.clientId = $clientTableName.id
+            INNER JOIN $carTableName
+                ON $orderTableName.carId = $carTableName.id
+            WHERE $carTableName.id = :carId
+            ORDER BY
+                $orderTableName.createdAt DESC,
+                $clientTableName.name ASC,
+                $carTableName.name ASC;"
         );
 
         $statement->bindValue("carId", $carId);
@@ -263,11 +276,11 @@ class MySqlOrderSource implements OrderSourceInterface
         return array_map(function ($fetched) {
             return (
                 new OrderModel(
-                    $fetched["id"],
+                    $fetched["orderId"],
                     new ClientModel(
                         $fetched["clientId"],
                         $fetched["clientName"],
-                        $fetched["contact"],
+                        $fetched["clientContact"],
                         $fetched["clientCreatedAt"],
                         $fetched["clientUpdatedAt"]
                     ),
