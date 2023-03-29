@@ -109,12 +109,18 @@ class MySqlOrderSource implements OrderSourceInterface
 
         $statement = $this->pdo->prepare("
         SELECT
-            $orderTableName.*,
-            $clientTableName.*,
+            $orderTableName.id AS orderId,
+            $orderTableName.clientId,
+            $orderTableName.carId,
+            $orderTableName.quantity,
+            $orderTableName.createdAt,
+            $orderTableName.updatedAt,
             $clientTableName.name AS clientName,
+            $clientTableName.contact AS clientContact,
             $clientTableName.createdAt AS clientCreatedAt,
             $clientTableName.updatedAt AS clientUpdatedAt,
-            $carTableName.*,
+            $carTableName.price AS carPrice,
+            $carTableName.inStock AS carInStock,
             $carTableName.name AS carName,
             $carTableName.createdAt AS carCreatedAt,
             $carTableName.updatedAt AS carUpdatedAt
@@ -138,19 +144,19 @@ class MySqlOrderSource implements OrderSourceInterface
         $order = $fetched[0];
 
         return new OrderModel(
-            $order["id"],
+            $order["orderId"],
             new ClientModel(
                 $order["clientId"],
                 $order["clientName"],
-                $order["contact"],
+                $order["clientContact"],
                 $order["clientCreatedAt"],
                 $order["clientUpdatedAt"]
             ),
             new CarModel(
                 $order["carId"],
                 $order["carName"],
-                $order["price"],
-                $order["inStock"],
+                $order["carPrice"],
+                $order["carInStock"],
                 $order["carCreatedAt"],
                 $order["carUpdatedAt"]
             ),
