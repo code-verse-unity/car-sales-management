@@ -11,7 +11,9 @@
 }
 
 .ca-image,
-.clients-image {
+.clients-image,
+.orders-image,
+.cars-image {
   background-size: cover;
   background-repeat: no-repeat;
   border-radius: 15px;
@@ -24,9 +26,24 @@
   width: 550px;
 }
 
+.clients-image,
+.orders-image,
+.cars-image {
+  height: 240px;
+  width: 350px;
+}
+
 .clients-image {
   background-image: url(assets/img/clients.png);
 
-  height: 240px;
-  width: 370px;
+}
+
+.orders-image {
+  background-image: url(assets/img/orders.png);
+
+}
+
+.cars-image {
+  background-image: url(assets/img/cars.png);
+
 }
