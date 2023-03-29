@@ -3,12 +3,15 @@
 ?>
 <main class="py-2">
   <div class="row py-4">
-    <div class="col d-flex flex-column">
+    <div class="col d-flex flex-column justify-content-between">
       <h1>Bienvenue dans le tableau de bord.</h1>
       <h5>Activités</h5>
     </div>
     <div class="col">
-      Image
+      <div class='ca-image d-flex flex-column justify-content-center p-4 text-light'>
+        <h4>Chiffre d'affaire </h4>
+        <div class="fw-bold display-4">152 000 000 Ar</div>
+      </div>
     </div>
   </div>
 
