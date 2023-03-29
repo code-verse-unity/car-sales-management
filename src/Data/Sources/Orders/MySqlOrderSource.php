@@ -168,7 +168,7 @@ class MySqlOrderSource implements OrderSourceInterface
 
     public function findByClientId(string $clientId): array
     {
-        $orderTableName = OrderModel::TABLE_NAME;
+        /* $orderTableName = OrderModel::TABLE_NAME;
         $clientTableName = ClientModel::TABLE_NAME;
         $carTableName = CarModel::TABLE_NAME;
 
@@ -230,79 +230,13 @@ class MySqlOrderSource implements OrderSourceInterface
                     $fetched["updatedAt"]
                 )
             )->getRaw();
-        }, $arrayFetched);
+        }, $arrayFetched); */
+        return [];
     }
 
-    public function findByCarId(string $carId): array
+    public function save(string $id, string $clientId, array $carsQuantities, string $createdAt, string $updatedAt): void
     {
-        $orderTableName = OrderModel::TABLE_NAME;
-        $clientTableName = ClientModel::TABLE_NAME;
-        $carTableName = CarModel::TABLE_NAME;
-
-        $statement = $this->pdo->prepare(
-            "SELECT
-                $orderTableName.id AS orderId,
-                $orderTableName.clientId,
-                $orderTableName.carId,
-                $orderTableName.quantity,
-                $orderTableName.createdAt,
-                $orderTableName.updatedAt,
-                $clientTableName.name AS clientName,
-                $clientTableName.contact AS clientContact,
-                $clientTableName.createdAt AS clientCreatedAt,
-                $clientTableName.updatedAt AS clientUpdatedAt,
-                $carTableName.price AS carPrice,
-                $carTableName.inStock AS carInStock,
-                $carTableName.name AS carName,
-                $carTableName.createdAt AS carCreatedAt,
-                $carTableName.updatedAt AS carUpdatedAt
-            FROM $orderTableName
-            INNER JOIN $clientTableName
-                ON $orderTableName.clientId = $clientTableName.id
-            INNER JOIN $carTableName
-                ON $orderTableName.carId = $carTableName.id
-            WHERE $carTableName.id = :carId
-            ORDER BY
-                $orderTableName.createdAt DESC,
-                $clientTableName.name ASC,
-                $carTableName.name ASC;"
-        );
-
-        $statement->bindValue("carId", $carId);
-        $statement->execute();
-
-        $arrayFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
-
-        return array_map(function ($fetched) {
-            return (
-                new OrderModel(
-                    $fetched["orderId"],
-                    new ClientModel(
-                        $fetched["clientId"],
-                        $fetched["clientName"],
-                        $fetched["clientContact"],
-                        $fetched["clientCreatedAt"],
-                        $fetched["clientUpdatedAt"]
-                    ),
-                    new CarModel(
-                        $fetched["carId"],
-                        $fetched["carName"],
-                        $fetched["price"],
-                        $fetched["inStock"],
-                        $fetched["carCreatedAt"],
-                        $fetched["carUpdatedAt"]
-                    ),
-                    $fetched["quantity"],
-                    $fetched["createdAt"],
-                    $fetched["updatedAt"]
-                )
-            )->getRaw();
-        }, $arrayFetched);
-    }
-
-    public function save(string $id, string $clientId, string $carId, int $quantity, string $createdAt, string $updatedAt): void
-    {
-        $statement = $this->pdo->prepare(
+        /* $statement = $this->pdo->prepare(
             "INSERT INTO " . OrderModel::TABLE_NAME .
             " (id, clientId, carId, quantity, createdAt, updatedAt)
             VALUES (:id, :clientId, :carId, :quantity, :createdAt, :updatedAt);"
@@ -315,28 +249,26 @@ class MySqlOrderSource implements OrderSourceInterface
         $statement->bindValue("createdAt", $createdAt);
         $statement->bindValue("updatedAt", $updatedAt);
 
-        $statement->execute();
+        $statement->execute(); */
     }
 
-    public function update(string $id, string $clientId, string $carId, int $quantity, string $createdAt, string $updatedAt): void
+    public function update(string $id, string $clientId, array $carsQuantities, string $createdAt, string $updatedAt): void
     {
-        $statement = $this->pdo->prepare(
-            "UPDATE " . OrderModel::TABLE_NAME .
-            " SET clientId = :clientId,
-                carId = :carId,
-                quantity = :quantity,
-                createdAt = :createdAt,
-                updatedAt = :updatedAt
-            WHERE id = :id;"
+        /* $statement = $this->pdo->prepare(
+        "UPDATE " . OrderModel::TABLE_NAME .
+        " SET clientId = :clientId,
+        carId = :carId,
+        quantity = :quantity,
+        createdAt = :createdAt,
+        updatedAt = :updatedAt
+        WHERE id = :id;"
         );
-
         $statement->bindValue("id", $id);
         $statement->bindValue("clientId", $clientId);
         $statement->bindValue("carId", $carId);
         $statement->bindValue("quantity", $quantity);
         $statement->bindValue("createdAt", $createdAt);
         $statement->bindValue("updatedAt", $updatedAt);
-
-        $statement->execute();
+        $statement->execute(); */
     }
 }
