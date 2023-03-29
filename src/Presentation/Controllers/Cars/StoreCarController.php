@@ -53,7 +53,7 @@ class StoreCarController
                 $response->redirect("/cars/" . $car["id"]);
             } else {
                 $response->renderView(
-                    "createCarView",
+                    "cars/create",
                     [
                         "car" => $car
                     ]

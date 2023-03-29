@@ -54,7 +54,7 @@ class ShowCarController
             $car = $useCaseResult;
 
             $response->renderView(
-                "showCarView",
+                "cars/show",
                 [
                     "car" => $car
                 ]
