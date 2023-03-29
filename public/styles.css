@@ -5,3 +5,28 @@
 .app-nav-link:hover {
   color: #ff973f;
 }
+
+.text-orange {
+  color: var(--bs-orange);
+}
+
+.ca-image,
+.clients-image {
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 15px;
+}
+
+.ca-image {
+  background-image: url(assets/img/ca.png);
+
+  height: 250px;
+  width: 550px;
+}
+
+.clients-image {
+  background-image: url(assets/img/clients.png);
+
+  height: 240px;
+  width: 370px;
+}
