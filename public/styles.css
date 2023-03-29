@@ -17,6 +17,16 @@
   background-size: cover;
   background-repeat: no-repeat;
   border-radius: 15px;
+
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+
+.clients-image:hover,
+.orders-image:hover,
+.cars-image:hover {
+  transform: scale(1.02);
 }
 
 .ca-image {
