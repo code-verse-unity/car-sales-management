@@ -32,8 +32,8 @@ function activeLink(string $link)
             <ul class="nav d-flex justify-content-end">
                 <li class="nav-item "><a href="/" <?= activeLink("") ?> aria-current="page">Acceuil</a></li>
                 <li class="nav-item"><a href="/clients" <?= activeLink("Clients") ?>>Clients</a></li>
-                <li class="nav-item"><a href="/voitures" <?= activeLink("Voitures") ?>>Voitures</a></li>
-                <li class="nav-item"><a href="/achats" <?= activeLink("Achats") ?>>Achats</a></li>
+                <li class="nav-item"><a href="/cars" <?= activeLink("Cars") ?>>Voitures</a></li>
+                <li class="nav-item"><a href="/orders" <?= activeLink("Orders") ?>>Achats</a></li>
             </ul>
         </div>
     </nav>
