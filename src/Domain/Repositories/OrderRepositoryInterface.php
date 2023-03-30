@@ -13,4 +13,5 @@ interface OrderRepositoryInterface
     // public function findByCarId(string $carId): array; // require more time to implement and maybe not necessary
     public function save(string $id, string $clientId, array $orderCarsIds, array $carsIds, array $quantities, string $createdAt, string $updatedAt): void;
     public function update(string $id, string $clientId, array $orderCarsIds, array $carsIds, array $quantities, string $createdAt, string $updatedAt): void;
+    public function delete(string $id): void;
 }

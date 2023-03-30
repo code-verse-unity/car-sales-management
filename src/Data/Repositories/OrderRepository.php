@@ -40,4 +40,9 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $this->source->update($id, $clientId, $orderCarsIds, $carsIds, $quantities, $createdAt, $updatedAt);
     }
+
+    public function delete(string $id): void
+    {
+        $this->source->delete($id);
+    }
 }

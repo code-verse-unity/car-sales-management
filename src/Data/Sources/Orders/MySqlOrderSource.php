@@ -426,4 +426,54 @@ class MySqlOrderSource implements OrderSourceInterface
     ): void {
         throw new ServerFailure("Not implemented yet.");
     }
+
+    /*
+    for this case, deleting an order === cancelling the order,
+    so all cars in the order must be returned to the stock
+    ! if deleting an order === deleting only the order, the logic won't work
+    */
+    public function delete(string $id): void
+    {
+        $orderTableName = OrderModel::TABLE_NAME;
+        $carTableName = CarModel::TABLE_NAME;
+        $orderCarsTableName = "order_cars";
+
+        $now = new DateTime();
+
+        $statement = $this->pdo->prepare(
+            "SELECT * FROM $orderCarsTableName WHERE orderId = :id;"
+        );
+        $statement->bindValue("id", $id);
+        $statement->execute();
+        $orderCars = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        // return all cars to the stock
+        foreach ($orderCars as $orderCar) {
+            $statement = $this->pdo->prepare(
+                "UPDATE $carTableName
+                SET inStock = inStock + :quantity,
+                    updatedAt = :updatedAt
+                WHERE id = :carId;"
+            );
+
+            $statement->bindValue("quantity", $orderCar["quantity"]);
+            $statement->bindValue("updatedAt", $now->format(DateTime::ATOM));
+            $statement->bindValue("carId", $orderCar["carId"]);
+            $statement->execute();
+        }
+
+        // delete the orderCars
+        $statement = $this->pdo->prepare(
+            "DELETE FROM $orderCarsTableName WHERE orderId = :orderId;"
+        );
+        $statement->bindValue("orderId", $id);
+        $statement->execute();
+
+        // delete the order
+        $statement = $this->pdo->prepare(
+            "DELETE FROM $orderTableName WHERE id = :id;"
+        );
+        $statement->bindValue("id", $id);
+        $statement->execute();
+    }
 }
