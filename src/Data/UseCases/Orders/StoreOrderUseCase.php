@@ -138,9 +138,6 @@ class StoreOrderUseCase
                 "order" => $order->getRaw()
             ];
         } catch (\Throwable $th) {
-            echo "<pre>";
-            print_r($th);
-            echo "</pre>";
             if ($th instanceof Failure) {
                 return $th;
             } else {
