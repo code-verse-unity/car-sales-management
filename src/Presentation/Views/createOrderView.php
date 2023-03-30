@@ -35,6 +35,24 @@
         <?php endforeach; ?>
     </select>
 
+    <select name="carId">
+        <?php foreach ($cars as $car): ?>
+            <option value="<?= $car["id"] ?>" <?= $order["carId"] === $car["id"] ? "selected" : "" ?>>
+                <?= $car["name"] ?>
+                <span> <!-- TODO add color indicating the number in stock, like red < 10, yellow < 20, green otherwise -->
+                    (
+                    <?= $car["inStock"] ?> disponibles
+                    )
+                </span>
+                <span><!-- ? Maybe the id is not necessary -->
+                    (
+                    <?= $car["id"] ?>
+                    )
+                </span>
+            </option>
+        <?php endforeach; ?>
+    </select>
+
     <label for="quantity">Quantité</label>
     <input type="number" name="quantity" id="quantity" value="<?= $order["quantity"] ?? "" ?>">
 

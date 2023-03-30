@@ -29,11 +29,90 @@ class StoreOrderUseCase
         $this->carRepository = $carRepository;
     }
 
-    public function execute($clientId, $carId, $quantity)
+    public function execute($clientId, $carsIds, $quantities)
     {
         try {
+            $client = $this->clientRepository->findById($clientId);
+
+            $carsQuantities = [];
+
+            // if there are many cars and many quantities, they must have the same length
+            if (is_array($carsIds) && is_array($quantities) && count($carsIds) === count($quantities)) {
+                /*
+                maybe the carsId is duplicated, so we sum the quantities,
+                ! but quantities must be digit string or int
+                ! that should not happen if the front and the request is set correctly
+                */
+                $unique = [];
+
+                foreach ($carsIds as $i => $carId) {
+                    if (array_key_exists($carId, $unique)) {
+                        $unique[$carId] += intval($quantities[$i]);
+                    } else {
+                        $unique[$carId] = intval($quantities[$i]);
+                    }
+                }
+
+                foreach ($unique as $carId => $quantity) {
+                    $carsQuantities[] = [
+                        "car" => $this->carRepository->findById($carId),
+                        "quantity" => $quantity,
+                    ];
+                }
+            } else if (is_string($carsIds) && is_string($quantities)) { // used for a single car and a single quantity
+                $carsQuantities[] = [
+                    "car" => $this->carRepository->findById($carsIds),
+                    "quantity" => $quantities,
+                ];
+            } else {
+                throw new ServerFailure("There is an (developer) error from the inputs.");
+            }
+
+            $randomStringGenerator = new RandomString(OrderModel::ID_CHARACTERS);
+
+            $order = new OrderModel($randomStringGenerator->generate(OrderModel::ID_LENGTH), $client, $carsQuantities, null, null);
+
+            $carsIds = $order->getCarsIds();
+            $length = count($carsIds);
+            $orderCarsIds = [];
+
+            $carOrdersIdLength = 21;
+
+            for ($i = 0; $i < $length; $i++) {
+                $orderCarsIds[] = $randomStringGenerator->generate($carOrdersIdLength);
+            }
+
+            if (!$order->hasErrors()) {
+                $this->orderRepository->save(
+                    $order->getId(),
+                    $order->getClientId(),
+                    $orderCarsIds,
+                    $carsIds,
+                    $order->getQuantities(),
+                    $order->getCreatedAt()->format(DateTime::ATOM),
+                    $order->getUpdatedAt()->format(DateTime::ATOM)
+                );
+
+                $carsQuantities = $order->getCarsQuantities(); // formatted by the Order entity, have extra property subtotal
+
+                foreach ($carsQuantities as $carQuantity) {
+                    $car = $carQuantity["car"];
+                    $quantity = $carQuantity["quantity"];
+
+                    $car->setInStock($car->getInStock() - $quantity); // the number in stock decrease
+                    $this->carRepository->update(
+                        $car->getId(),
+                        $car->getName(),
+                        $car->getPrice(),
+                        $car->getInStock(),
+                        $car->getCreatedAt()->format(DateTime::ATOM),
+                        $car->getUpdatedAt()->format(DateTime::ATOM)
+                    );
+                }
+            }
+
             $clients = $this->clientRepository->findAll();
-            $cars = $this->carRepository->findAll();
+            $cars = $this->carRepository->findByMinInStock(1); // we get only cars with one or more inStock    
 
             $clientsRaw = array_map(
                 function ($client) {
@@ -43,52 +122,13 @@ class StoreOrderUseCase
                 $clients
             );
 
-            // only get car with one or more inStock
-            $carsFiltered = array_filter(
-                $cars,
-                function ($car) {
-                    return $car->getInStock() > 0;
-                }
-            );
-
             $carsRaw = array_map(
                 function ($car) {
                     $car->lock();
                     return $car->getRaw();
                 },
-                $carsFiltered
+                $cars
             );
-
-            $client = $this->clientRepository->findById($clientId);
-            $car = $this->carRepository->findById($carId);
-
-            $randomStringGenerator = new RandomString(CarModel::ID_CHARACTERS);
-            $id = $randomStringGenerator->generate(CarModel::ID_LENGTH);
-
-            $order = new OrderModel($id, $client, $car, $quantity, null, null);
-
-            if (!$order->hasErrors()) {
-                $this->orderRepository->save(
-                    $order->getId(),
-                    $order->getClientId(),
-                    $order->getCarId(),
-                    $order->getQuantity(),
-                    $order->getCreatedAt()->format(DateTime::ATOM),
-                    $order->getUpdatedAt()->format(DateTime::ATOM)
-                );
-
-                // this shouldn't create errors if the setQuantity and getQuantity are well set
-                // we subtract inStock of the car and save it
-                $car->setInStock($car->getInStock() - $order->getQuantity());
-                $this->carRepository->update(
-                    $car->getId(),
-                    $car->getName(),
-                    $car->getPrice(),
-                    $car->getInStock(),
-                    $car->getCreatedAt()->format(DateTime::ATOM),
-                    $car->getUpdatedAt()->format(DateTime::ATOM)
-                );
-            }
 
             $order->lock();
 
@@ -98,6 +138,9 @@ class StoreOrderUseCase
                 "order" => $order->getRaw()
             ];
         } catch (\Throwable $th) {
+            echo "<pre>";
+            print_r($th);
+            echo "</pre>";
             if ($th instanceof Failure) {
                 return $th;
             } else {

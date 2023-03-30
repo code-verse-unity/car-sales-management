@@ -24,8 +24,8 @@ class StoreOrderController
         $body = $request->body;
 
         $useCaseResult = $this->storeOrderUseCase->execute(
-            $body["clientId"] ?? "",
-            $body["carId"] ?? "",
+            $body["clientId"],
+            $body["carId"],
             $body["quantity"]
         );
 

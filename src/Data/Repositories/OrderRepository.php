@@ -31,13 +31,13 @@ class OrderRepository implements OrderRepositoryInterface
         return $this->source->findByClientId($clientId);
     }
 
-    public function save(string $id, string $clientId, array $carsQuantities, string $createdAt, string $updatedAt): void
+    public function save(string $id, string $clientId, array $orderCarsIds, array $carsIds, array $quantities, string $createdAt, string $updatedAt): void
     {
-        $this->source->save($id, $clientId, $carsQuantities, $createdAt, $updatedAt);
+        $this->source->save($id, $clientId, $orderCarsIds, $carsIds, $quantities, $createdAt, $updatedAt);
     }
 
-    public function update(string $id, string $clientId, array $carsQuantities, string $createdAt, string $updatedAt): void
+    public function update(string $id, string $clientId, array $orderCarsIds, array $carsIds, array $quantities, string $createdAt, string $updatedAt): void
     {
-        $this->source->update($id, $clientId, $carsQuantities, $createdAt, $updatedAt);
+        $this->source->update($id, $clientId, $orderCarsIds, $carsIds, $quantities, $createdAt, $updatedAt);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Data\Sources\Orders;
 
 use App\Core\Utils\Failures\NotFoundFailure;
+use App\Core\Utils\Failures\ServerFailure;
 use App\Data\Sources\Orders\OrderSourceInterface;
 use App\Data\Models\OrderModel;
 use App\Data\Models\ClientModel;
@@ -371,39 +372,58 @@ class MySqlOrderSource implements OrderSourceInterface
         return [];
     }
 
-    public function save(string $id, string $clientId, array $carsQuantities, string $createdAt, string $updatedAt): void
-    {
-        /* $statement = $this->pdo->prepare(
-        "INSERT INTO " . OrderModel::TABLE_NAME .
-        " (id, clientId, carId, quantity, createdAt, updatedAt)
-        VALUES (:id, :clientId, :carId, :quantity, :createdAt, :updatedAt);"
+    public function save(
+        string $id,
+        string $clientId,
+        array $orderCarsIds,
+        array $carsIds,
+        array $quantities,
+        string $createdAt, string $updatedAt
+    ): void {
+        $orderTableName = OrderModel::TABLE_NAME;
+        $orderCarsTableName = "order_cars";
+
+        // save the order
+        $statement = $this->pdo->prepare(
+            "INSERT INTO $orderTableName 
+                (id, clientId, createdAt, updatedAt)
+            VALUES
+                (:id, :clientId, :createdAt, :updatedAt);"
         );
         $statement->bindValue("id", $id);
         $statement->bindValue("clientId", $clientId);
-        $statement->bindValue("carId", $carId);
-        $statement->bindValue("quantity", $quantity);
         $statement->bindValue("createdAt", $createdAt);
         $statement->bindValue("updatedAt", $updatedAt);
-        $statement->execute(); */
+        $statement->execute();
+
+        $length = count($orderCarsIds);
+        for ($i = 0; $i < $length; $i++) {
+            $statement = $this->pdo->prepare(
+                "INSERT INTO $orderCarsTableName
+                    (id, orderId, carId, quantity, createdAt, updatedAt)
+                VALUES
+                    (:id, :orderId, :carId, :quantity, :createdAt, :updatedAt);"
+            );
+
+            $statement->bindValue("id", $orderCarsIds[$i]);
+            $statement->bindValue("orderId", $id);
+            $statement->bindValue("carId", $carsIds[$i]);
+            $statement->bindValue("quantity", $quantities[$i]);
+            $statement->bindValue("createdAt", $createdAt);
+            $statement->bindValue("updatedAt", $updatedAt);
+            $statement->execute();
+        }
     }
 
-    public function update(string $id, string $clientId, array $carsQuantities, string $createdAt, string $updatedAt): void
-    {
-        /* $statement = $this->pdo->prepare(
-        "UPDATE " . OrderModel::TABLE_NAME .
-        " SET clientId = :clientId,
-        carId = :carId,
-        quantity = :quantity,
-        createdAt = :createdAt,
-        updatedAt = :updatedAt
-        WHERE id = :id;"
-        );
-        $statement->bindValue("id", $id);
-        $statement->bindValue("clientId", $clientId);
-        $statement->bindValue("carId", $carId);
-        $statement->bindValue("quantity", $quantity);
-        $statement->bindValue("createdAt", $createdAt);
-        $statement->bindValue("updatedAt", $updatedAt);
-        $statement->execute(); */
+    public function update(
+        string $id,
+        string $clientId,
+        array $orderCarsIds,
+        array $carsIds,
+        array $quantities,
+        string $createdAt,
+        string $updatedAt
+    ): void {
+        throw new ServerFailure("Not implemented yet.");
     }
 }

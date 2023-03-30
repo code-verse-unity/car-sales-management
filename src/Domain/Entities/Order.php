@@ -78,6 +78,11 @@ abstract class Order implements EntityInterface
     ) {
       throw new ServerFailure();
     }
+    
+    // when there is no car in the order
+    if (empty($carsQuantities)) {
+      $this->addErrorByAttribute("general", "L'achat d'au moins une voiture est nécessaire.");
+    }
 
     return array_map(
       function ($carQuantity) {
