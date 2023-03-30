@@ -56,7 +56,7 @@ class StoreOrderUseCase
                 foreach ($unique as $carId => $quantity) {
                     $carsQuantities[] = [
                         "car" => $this->carRepository->findById($carId),
-                        "quantity" => $quantity,
+                        "quantity" => intval($quantity),
                     ];
                 }
             } else if (is_string($carsIds) && is_string($quantities)) { // used for a single car and a single quantity

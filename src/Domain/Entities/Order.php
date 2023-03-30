@@ -78,7 +78,7 @@ abstract class Order implements EntityInterface
     ) {
       throw new ServerFailure();
     }
-    
+
     // when there is no car in the order
     if (empty($carsQuantities)) {
       $this->addErrorByAttribute("general", "L'achat d'au moins une voiture est nécessaire.");
@@ -245,7 +245,7 @@ abstract class Order implements EntityInterface
           return [
             "car" => $carQuantity["car"]->getRaw(),
             "quantity" => $carQuantity["quantity"],
-            "subtotal" => $carQuantity["car"]->getPrice() * $carQuantity["quantity"],
+            "subtotal" => is_numeric($carQuantity["quantity"]) ? $carQuantity["car"]->getPrice() * $carQuantity["quantity"] : "-",
           ];
         },
         $this->getCarsQuantities()
@@ -262,20 +262,24 @@ abstract class Order implements EntityInterface
   {
     return array_map(
       function ($carQuantity) {
-        return $carQuantity["car"]->getPrice() * $carQuantity["quantity"];
+        return is_numeric($carQuantity["quantity"]) ? $carQuantity["car"]->getPrice() * $carQuantity["quantity"] : "-"; // return "-" if there is an error on the calculation
       }, $this->carsQuantities
     );
   }
 
   public function getTotal()
   {
-    return array_reduce(
-      $this->carsQuantities,
-      function ($prev, $curr) {
-        return $prev + $curr["car"]->getPrice() * $curr["quantity"];
-      },
-      0
-    );
+    if (in_array("-", $this->getSubtotals())) {
+      return "-"; // return "-" if there is an error on the calculation
+    } else {
+      return array_reduce(
+        $this->carsQuantities,
+        function ($prev, $curr) {
+          return $prev + $curr["car"]->getPrice() * $curr["quantity"];
+        },
+        0
+      );
+    }
   }
 
   public function lock(): void
