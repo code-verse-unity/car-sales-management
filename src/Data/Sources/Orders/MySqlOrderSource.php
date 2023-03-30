@@ -178,63 +178,132 @@ class MySqlOrderSource implements OrderSourceInterface
         $orderTableName = OrderModel::TABLE_NAME;
         $clientTableName = ClientModel::TABLE_NAME;
         $carTableName = CarModel::TABLE_NAME;
+        $orderCarsTableName = "order_cars";
 
-        $statement = $this->pdo->prepare("
-        SELECT
-            $orderTableName.id AS orderId,
-            $orderTableName.clientId,
-            $orderTableName.carId,
-            $orderTableName.quantity,
-            $orderTableName.createdAt,
-            $orderTableName.updatedAt,
-            $clientTableName.name AS clientName,
-            $clientTableName.contact AS clientContact,
-            $clientTableName.createdAt AS clientCreatedAt,
-            $clientTableName.updatedAt AS clientUpdatedAt,
-            $carTableName.price AS carPrice,
-            $carTableName.inStock AS carInStock,
-            $carTableName.name AS carName,
-            $carTableName.createdAt AS carCreatedAt,
-            $carTableName.updatedAt AS carUpdatedAt
-        FROM $orderTableName
-        INNER JOIN $clientTableName
-            ON $orderTableName.clientId = $clientTableName.id
-        INNER JOIN $carTableName
-            ON $orderTableName.carId = $carTableName.id
-        WHERE $orderTableName.id = :id
-        LIMIT 1;");
+        $intervalQuery = "";
 
+        $statement = $this->pdo->prepare(
+            "SELECT
+                $orderTableName.id AS orderId,
+                $orderTableName.clientId,
+                $orderTableName.createdAt AS orderCreatedAt,
+                $orderTableName.updatedAt As orderUpdatedAt,
+                $clientTableName.id AS clientId,
+                $clientTableName.name AS clientName,
+                $clientTableName.contact AS clientContact,
+                $clientTableName.createdAt AS clientCreatedAt,
+                $clientTableName.updatedAt AS clientUpdatedAt,
+                $carTableName.id AS carId,
+                $carTableName.price AS carPrice,
+                $carTableName.inStock AS carInStock,
+                $carTableName.name AS carName,
+                $carTableName.createdAt AS carCreatedAt,
+                $carTableName.updatedAt AS carUpdatedAt,
+                $orderCarsTableName.quantity
+            FROM $orderTableName
+            INNER JOIN $clientTableName
+                ON $orderTableName.clientId = $clientTableName.id
+            INNER JOIN $orderCarsTableName
+                ON $orderTableName.id = $orderCarsTableName.orderId
+            INNER JOIN $carTableName
+                ON $orderCarsTableName.carId = $carTableName.id
+            WHERE $orderTableName.id = :id
+            ORDER BY
+                $orderTableName.createdAt DESC,
+                $clientTableName.name ASC,
+                $carTableName.name ASC
+            ;"
+        );
         $statement->bindValue("id", $id);
         $statement->execute();
 
-        $fetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $arrayFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        if (empty($fetched)) {
+        if (empty($arrayFetched)) {
             throw new NotFoundFailure();
         }
 
-        $order = $fetched[0];
+        $orderIdArr = [];
 
-        return new OrderModel(
-            $order["orderId"],
-            new ClientModel(
-                $order["clientId"],
-                $order["clientName"],
-                $order["clientContact"],
-                $order["clientCreatedAt"],
-                $order["clientUpdatedAt"]
-            ),
-            new CarModel(
-                $order["carId"],
-                $order["carName"],
-                $order["carPrice"],
-                $order["carInStock"],
-                $order["carCreatedAt"],
-                $order["carUpdatedAt"]
-            ),
-            $order["quantity"],
-            $order["createdAt"],
-            $order["updatedAt"]
+        foreach ($arrayFetched as $fetched) {
+            if (array_key_exists($fetched["orderId"], $orderIdArr)) {
+                $orderIdArr[$fetched["orderId"]]["cars"][$fetched["carId"]] =
+                    [
+                        "car" => [
+                            "id" => $fetched["carId"],
+                            "price" => $fetched["carPrice"],
+                            "inStock" => $fetched["carInStock"],
+                            "name" => $fetched["carName"],
+                            "createdAt" => $fetched["carCreatedAt"],
+                            "updatedAt" => $fetched["carUpdatedAt"],
+                        ],
+                        "quantity" => $fetched["quantity"]
+                    ]
+                ;
+            } else {
+                $orderIdArr[$fetched["orderId"]] = [
+                    "id" => $fetched["orderId"],
+                    "clientId" => $fetched["clientId"],
+                    "createdAt" => $fetched["orderCreatedAt"],
+                    "updatedAt" => $fetched["orderUpdatedAt"],
+                    "client" => [
+                        "id" => $fetched["clientId"],
+                        "name" => $fetched["clientName"],
+                        "contact" => $fetched["clientContact"],
+                        "createdAt" => $fetched["clientCreatedAt"],
+                        "updatedAt" => $fetched["clientUpdatedAt"],
+                    ],
+                    "cars" => [
+                        $fetched["carId"] => [
+                            "car" => [
+                                "id" => $fetched["carId"],
+                                "price" => $fetched["carPrice"],
+                                "inStock" => $fetched["carInStock"],
+                                "name" => $fetched["carName"],
+                                "createdAt" => $fetched["carCreatedAt"],
+                                "updatedAt" => $fetched["carUpdatedAt"],
+                            ],
+                            "quantity" => $fetched["quantity"]
+                        ],
+                    ]
+                ];
+            }
+        }
+
+        $orderArr = array_values($orderIdArr)[0];
+
+        return (
+            new OrderModel(
+                $orderArr["id"],
+                new ClientModel(
+                    $orderArr["client"]["id"],
+                    $orderArr["client"]["name"],
+                    $orderArr["client"]["contact"],
+                    $orderArr["client"]["createdAt"],
+                    $orderArr["client"]["updatedAt"]
+                ),
+                array_map(
+                    function ($carIdArr) {
+                        $car = $carIdArr["car"];
+                        $quantity = $carIdArr["quantity"];
+
+                        return [
+                            "car" => new CarModel(
+                                $car["id"],
+                                $car["name"],
+                                $car["price"],
+                                $car["inStock"],
+                                $car["createdAt"],
+                                $car["updatedAt"],
+                            ),
+                            "quantity" => $quantity
+                        ];
+                    },
+                    array_values($orderArr["cars"])
+                ),
+                $orderArr["createdAt"],
+                $orderArr["updatedAt"]
+            )
         );
     }
 
