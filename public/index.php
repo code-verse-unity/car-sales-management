@@ -108,8 +108,8 @@ $app->router->post("/clients", [$storeClientController, "execute"]);
 // Car routes
 // change POST /cars to POST /cars/create to make getting the form page and posting it to the same path, only the method differs
 $app->router->get("/cars", [$indexCarController, "execute"]); // with search functionality
-$app->router->post("/cars/create", [$storeCarController, "execute"]);
 $app->router->get("/cars/add", [$createCarController, "execute"]);
+$app->router->post("/cars", [$storeCarController, "execute"]);
 $app->router->get("/cars/{carId}/edit", [$editCarController, "execute"]);
 $app->router->put("/cars/{carId}/edit", [$updateCarController, "execute"]); // ! this one works on postman, but not in the browser because there is no PUT method from html
 $app->router->post("/cars/{carId}/edit", [$updateCarController, "execute"]); // ! this one can works on both, and doesn't have any collision with other paths, note the POST method
