@@ -37,7 +37,7 @@ class StoreClientController
       $indexClientUseCase = new IndexClientUseCase($this->storeClientUseCase->getRepository());
       $clients = $indexClientUseCase->execute();
 
-      $response->renderView("clients", ["clients" => $clients]);
+      $response->renderView("clients/index", ["clients" => $clients]);
     }
   }
 }
