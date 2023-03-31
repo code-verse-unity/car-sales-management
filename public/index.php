@@ -29,6 +29,8 @@ use App\Presentation\Controllers\Cars\CreateCarController;
 use App\Presentation\Controllers\Cars\IndexCarController;
 use App\Presentation\Controllers\Cars\UpdateCarController;
 use App\Presentation\Controllers\Cars\EditCarController;
+use App\Presentation\Controllers\Clients\CreateCarController as ClientsCreateCarController;
+use App\Presentation\Controllers\Clients\CreateClientController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -57,6 +59,8 @@ $storeClientController = new StoreClientController($storeClientUseCase);
 // UpdateClientUseCase
 $updateClientUseCase = new UpdateClientUseCase($clientRepository);
 $updateClientController = new UpdateClientController($updateClientUseCase);
+// Create a new client view
+$createClientController = new CreateClientController();
 
 // Car
 // Source and repository
@@ -93,14 +97,15 @@ This is the path to update a client,
 The clientId is automatically in $request->params.
 So there is no need to add id in the body of the request, it won't be used
 */
-$app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
 $app->router->get('/', [$homeController, 'execute']);
+$app->router->get("/clients/add", [$createClientController, "execute"]);
+$app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
 
 // Car routes
 // change POST /cars to POST /cars/create to make getting the form page and posting it to the same path, only the method differs
 $app->router->get("/cars", [$indexCarController, "execute"]); // with search functionality
 $app->router->post("/cars/create", [$storeCarController, "execute"]);
-$app->router->get("/cars/create", [$createCarController, "execute"]);
+$app->router->get("/cars/add", [$createCarController, "execute"]);
 $app->router->get("/cars/{carId}/edit", [$editCarController, "execute"]);
 $app->router->put("/cars/{carId}/edit", [$updateCarController, "execute"]); // ! this one works on postman, but not in the browser because there is no PUT method from html
 $app->router->post("/cars/{carId}/edit", [$updateCarController, "execute"]); // ! this one can works on both, and doesn't have any collision with other paths, note the POST method
