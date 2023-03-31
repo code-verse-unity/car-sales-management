@@ -5,6 +5,7 @@ namespace App\Data\UseCases\Orders;
 use App\Core\Utils\Failures\ServerFailure;
 use App\Core\Utils\Strings\RandomString;
 use App\Data\Models\OrderModel;
+use App\Data\UseCases\Bills\StoreBillUseCase;
 use App\Domain\Repositories\OrderRepositoryInterface;
 use App\Data\Models\CarModel;
 use App\Core\Utils\Failures\Failure;
@@ -17,7 +18,6 @@ class StoreOrderUseCase
     private OrderRepositoryInterface $orderRepository;
     private ClientRepositoryInterface $clientRepository;
     private CarRepositoryInterface $carRepository;
-
 
     public function __construct(
         OrderRepositoryInterface $orderRepository,
@@ -108,6 +108,12 @@ class StoreOrderUseCase
                         $car->getCreatedAt()->format(DateTime::ATOM),
                         $car->getUpdatedAt()->format(DateTime::ATOM)
                     );
+                }
+
+                $storeBillUseCase = new StoreBillUseCase($order);
+                $useCaseResult = $storeBillUseCase->execute();
+                if ($useCaseResult instanceof Failure) {
+                    return $useCaseResult;
                 }
             }
 

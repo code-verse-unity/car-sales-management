@@ -9,6 +9,7 @@ abstract class Order implements EntityInterface
 {
   const ID_LENGTH = 21;
   const ID_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
+  const CURRENCY_CODE = "Ar";
 
   private $id;
   private Client $client;

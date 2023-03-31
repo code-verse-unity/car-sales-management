@@ -25,6 +25,7 @@ use App\Data\UseCases\Orders\StoreOrderUseCase;
 use App\Data\UseCases\Orders\IndexOrderUseCase;
 use App\Data\UseCases\Orders\ShowOrderUseCase;
 use App\Data\UseCases\Orders\DestroyOrderUseCase;
+use App\Data\UseCases\Bills\DownloadBillUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
@@ -40,6 +41,7 @@ use App\Presentation\Controllers\Orders\CreateOrderController;
 use App\Presentation\Controllers\Orders\IndexOrderController;
 use App\Presentation\Controllers\Orders\ShowOrderController;
 use App\Presentation\Controllers\Orders\DestroyOrderController;
+use App\Presentation\Controllers\Bills\DownloadBillController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -110,6 +112,10 @@ $showOrderController = new ShowOrderController($showOrderUseCase);
 $destroyOrderUseCase = new DestroyOrderUseCase($orderRepository);
 $destroyOrderController = new DestroyOrderController($destroyOrderUseCase);
 
+// Bills
+$downloadBillUseCase = new DownloadBillUseCase($orderRepository);
+$downloadBillController = new DownloadBillController($downloadBillUseCase);
+
 $app = new Application();
 
 $app->router->post("/users", [$storeUserController, "execute"]);
@@ -141,5 +147,8 @@ $app->router->post("/orders/create", [$storeOrderController, "execute"]);
 $app->router->post("/orders/{orderId}/delete", [$destroyOrderController, "execute"]);
 $app->router->delete("/orders/{orderId}/delete", [$destroyOrderController, "execute"]);
 $app->router->get("/orders/{orderId}", [$showOrderController, "execute"]);
+
+// Bills routes
+$app->router->get("/bills/{orderId}/download", [$downloadBillController, "execute"]);
 
 $app->run();
