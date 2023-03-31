@@ -11,7 +11,7 @@ abstract class Car implements EntityInterface
   const ID_CHARACTERS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_";
   const NAME_MIN_LENGTH = 1;
   const PRICE_MIN_VALUE = 1;
-  const PRICE_CURRENCY_CODE = "MGA";
+  const PRICE_CURRENCY_CODE = "Ar";
 
   private $id;
   private $name;

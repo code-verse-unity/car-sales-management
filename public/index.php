@@ -7,9 +7,11 @@ use App\Core\Applications\Application;
 use App\Data\Repositories\CarRepository;
 use App\Data\Repositories\UserRepository;
 use App\Data\Repositories\ClientRepository;
+use App\Data\Repositories\OrderRepository;
 use App\Data\Sources\Users\MysqlUserSource;
 use App\Data\Sources\Cars\MySqlCarSource;
 use App\Data\Sources\Clients\MySqlClientSource;
+use App\Data\Sources\Orders\MySqlOrderSource;
 use App\Data\UseCases\Clients\IndexClientUseCase;
 use App\Data\UseCases\Clients\StoreClientUseCase;
 use App\Data\UseCases\Clients\UpdateClientUseCase;
@@ -18,6 +20,12 @@ use App\Data\UseCases\Cars\ShowCarUseCase;
 use App\Data\UseCases\Cars\IndexCarUseCase;
 use App\Data\UseCases\Cars\UpdateCarUseCase;
 use App\Data\UseCases\Users\StoreUserUseCase;
+use App\Data\UseCases\Orders\CreateOrderUseCase;
+use App\Data\UseCases\Orders\StoreOrderUseCase;
+use App\Data\UseCases\Orders\IndexOrderUseCase;
+use App\Data\UseCases\Orders\ShowOrderUseCase;
+use App\Data\UseCases\Orders\DestroyOrderUseCase;
+use App\Data\UseCases\Bills\DownloadBillUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
@@ -29,6 +37,12 @@ use App\Presentation\Controllers\Cars\CreateCarController;
 use App\Presentation\Controllers\Cars\IndexCarController;
 use App\Presentation\Controllers\Cars\UpdateCarController;
 use App\Presentation\Controllers\Cars\EditCarController;
+use App\Presentation\Controllers\Orders\StoreOrderController;
+use App\Presentation\Controllers\Orders\CreateOrderController;
+use App\Presentation\Controllers\Orders\IndexOrderController;
+use App\Presentation\Controllers\Orders\ShowOrderController;
+use App\Presentation\Controllers\Orders\DestroyOrderController;
+use App\Presentation\Controllers\Bills\DownloadBillController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -79,6 +93,29 @@ $updateCarController = new UpdateCarController($updateCarUseCase);
 // EditCarController
 $editCarController = new EditCarController($showCarUseCase);
 
+// Orders
+// Source and Repository
+$mySqlOrderSource = new MySqlOrderSource($pdo);
+$orderRepository = new OrderRepository($mySqlOrderSource);
+// StoreOrderUseCase and StoreOrderController
+$storeOrderUseCase = new StoreOrderUseCase($orderRepository, $clientRepository, $carRepository);
+$storeOrderController = new StoreOrderController($storeOrderUseCase);
+// CreateOrderUseCase and CreateOrderController
+$createOrderUseCase = new CreateOrderUseCase($clientRepository, $carRepository);
+$createOrderController = new CreateOrderController($createOrderUseCase);
+// IndexOrderUseCase and IndexOrderController
+$indexOrderUseCase = new IndexOrderUseCase($orderRepository);
+$indexOrderController = new IndexOrderController($indexOrderUseCase);
+// ShowOrderUseCase and ShowOrderController
+$showOrderUseCase = new ShowOrderUseCase($orderRepository);
+$showOrderController = new ShowOrderController($showOrderUseCase);
+// DestroyOrderUseCase and DestroyOrderController
+$destroyOrderUseCase = new DestroyOrderUseCase($orderRepository);
+$destroyOrderController = new DestroyOrderController($destroyOrderUseCase);
+
+// Bills
+$downloadBillUseCase = new DownloadBillUseCase($orderRepository);
+$downloadBillController = new DownloadBillController($downloadBillUseCase);
 $homeController = new HomeController();
 
 $app = new Application();
@@ -105,5 +142,16 @@ $app->router->get("/cars/{carId}/edit", [$editCarController, "execute"]);
 $app->router->put("/cars/{carId}/edit", [$updateCarController, "execute"]); // ! this one works on postman, but not in the browser because there is no PUT method from html
 $app->router->post("/cars/{carId}/edit", [$updateCarController, "execute"]); // ! this one can works on both, and doesn't have any collision with other paths, note the POST method
 $app->router->get("/cars/{carId}", [$showCarController, "execute"]);
+
+// Order routes
+$app->router->get("/orders", [$indexOrderController, "execute"]);
+$app->router->get("/orders/create", [$createOrderController, "execute"]);
+$app->router->post("/orders/create", [$storeOrderController, "execute"]);
+$app->router->post("/orders/{orderId}/delete", [$destroyOrderController, "execute"]);
+$app->router->delete("/orders/{orderId}/delete", [$destroyOrderController, "execute"]);
+$app->router->get("/orders/{orderId}", [$showOrderController, "execute"]);
+
+// Bills routes
+$app->router->get("/bills/{orderId}/download", [$downloadBillController, "execute"]);
 
 $app->run();
