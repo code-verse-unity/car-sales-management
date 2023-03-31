@@ -43,7 +43,7 @@
     <div class="d-flex justify-content-between align-items-center">
         <h1 class="display-4 fw-bold">Liste des <span class="text-orange">Voitures</span>.</h1>
         <div>
-            <button class="btn btn-primary">Ajouter</button>
+            <button class="btn btn-primary" id='add-car'>Ajouter</button>
         </div>
     </div>
 
@@ -71,3 +71,11 @@
     </div>
 
 </main>
+
+
+<script>
+    const addClientButton = document.getElementById('add-car');
+    addClientButton.addEventListener('click', () => {
+        window.location.href = '/cars/add';
+    });
+</script>
