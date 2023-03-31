@@ -85,93 +85,7 @@ class MySqlOrderSource implements OrderSourceInterface
         $statement->execute();
         $arrayFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        $orderIdArr = [];
-
-        foreach ($arrayFetched as $fetched) {
-            if (array_key_exists($fetched["orderId"], $orderIdArr)) {
-                $orderIdArr[$fetched["orderId"]]["cars"][$fetched["carId"]] =
-                    [
-                        "car" => [
-                            "id" => $fetched["carId"],
-                            "price" => $fetched["carPrice"],
-                            "inStock" => $fetched["carInStock"],
-                            "name" => $fetched["carName"],
-                            "createdAt" => $fetched["carCreatedAt"],
-                            "updatedAt" => $fetched["carUpdatedAt"],
-                        ],
-                        "quantity" => $fetched["quantity"]
-                    ]
-                ;
-            } else {
-                $orderIdArr[$fetched["orderId"]] = [
-                    "id" => $fetched["orderId"],
-                    "clientId" => $fetched["clientId"],
-                    "createdAt" => $fetched["orderCreatedAt"],
-                    "updatedAt" => $fetched["orderUpdatedAt"],
-                    "client" => [
-                        "id" => $fetched["clientId"],
-                        "name" => $fetched["clientName"],
-                        "contact" => $fetched["clientContact"],
-                        "createdAt" => $fetched["clientCreatedAt"],
-                        "updatedAt" => $fetched["clientUpdatedAt"],
-                    ],
-                    "cars" => [
-                        $fetched["carId"] => [
-                            "car" => [
-                                "id" => $fetched["carId"],
-                                "price" => $fetched["carPrice"],
-                                "inStock" => $fetched["carInStock"],
-                                "name" => $fetched["carName"],
-                                "createdAt" => $fetched["carCreatedAt"],
-                                "updatedAt" => $fetched["carUpdatedAt"],
-                            ],
-                            "quantity" => $fetched["quantity"]
-                        ],
-                    ]
-                ];
-            }
-        }
-
-        return array_values(
-            array_map(
-                function ($orderArr) {
-                    return (
-                        new OrderModel(
-                            $orderArr["id"],
-                            new ClientModel(
-                                $orderArr["client"]["id"],
-                                $orderArr["client"]["name"],
-                                $orderArr["client"]["contact"],
-                                $orderArr["client"]["createdAt"],
-                                $orderArr["client"]["updatedAt"]
-                            ),
-                            array_map(
-                                function ($carIdArr) {
-                                            $car = $carIdArr["car"];
-                                            $quantity = $carIdArr["quantity"];
-
-                                            return [
-                                                "car" => new CarModel(
-                                                    $car["id"],
-                                                    $car["name"],
-                                                    $car["price"],
-                                                    $car["inStock"],
-                                                    $car["createdAt"],
-                                                    $car["updatedAt"],
-                                                ),
-                                                "quantity" => $quantity
-                                            ];
-                                        },
-                                array_values($orderArr["cars"])
-                            ),
-                            $orderArr["createdAt"],
-                            $orderArr["updatedAt"]
-                        )
-                    );
-                },
-                $orderIdArr
-            )
-        );
+        return $this->createOrdersFromArrayFetched($arrayFetched);
     }
 
     public function findById(string $id): OrderModel
@@ -224,88 +138,7 @@ class MySqlOrderSource implements OrderSourceInterface
             throw new NotFoundFailure();
         }
 
-        $orderIdArr = [];
-
-        foreach ($arrayFetched as $fetched) {
-            if (array_key_exists($fetched["orderId"], $orderIdArr)) {
-                $orderIdArr[$fetched["orderId"]]["cars"][$fetched["carId"]] =
-                    [
-                        "car" => [
-                            "id" => $fetched["carId"],
-                            "price" => $fetched["carPrice"],
-                            "inStock" => $fetched["carInStock"],
-                            "name" => $fetched["carName"],
-                            "createdAt" => $fetched["carCreatedAt"],
-                            "updatedAt" => $fetched["carUpdatedAt"],
-                        ],
-                        "quantity" => $fetched["quantity"]
-                    ]
-                ;
-            } else {
-                $orderIdArr[$fetched["orderId"]] = [
-                    "id" => $fetched["orderId"],
-                    "clientId" => $fetched["clientId"],
-                    "createdAt" => $fetched["orderCreatedAt"],
-                    "updatedAt" => $fetched["orderUpdatedAt"],
-                    "client" => [
-                        "id" => $fetched["clientId"],
-                        "name" => $fetched["clientName"],
-                        "contact" => $fetched["clientContact"],
-                        "createdAt" => $fetched["clientCreatedAt"],
-                        "updatedAt" => $fetched["clientUpdatedAt"],
-                    ],
-                    "cars" => [
-                        $fetched["carId"] => [
-                            "car" => [
-                                "id" => $fetched["carId"],
-                                "price" => $fetched["carPrice"],
-                                "inStock" => $fetched["carInStock"],
-                                "name" => $fetched["carName"],
-                                "createdAt" => $fetched["carCreatedAt"],
-                                "updatedAt" => $fetched["carUpdatedAt"],
-                            ],
-                            "quantity" => $fetched["quantity"]
-                        ],
-                    ]
-                ];
-            }
-        }
-
-        $orderArr = array_values($orderIdArr)[0];
-
-        return (
-            new OrderModel(
-                $orderArr["id"],
-                new ClientModel(
-                    $orderArr["client"]["id"],
-                    $orderArr["client"]["name"],
-                    $orderArr["client"]["contact"],
-                    $orderArr["client"]["createdAt"],
-                    $orderArr["client"]["updatedAt"]
-                ),
-                array_map(
-                    function ($carIdArr) {
-                        $car = $carIdArr["car"];
-                        $quantity = $carIdArr["quantity"];
-
-                        return [
-                            "car" => new CarModel(
-                                $car["id"],
-                                $car["name"],
-                                $car["price"],
-                                $car["inStock"],
-                                $car["createdAt"],
-                                $car["updatedAt"],
-                            ),
-                            "quantity" => $quantity
-                        ];
-                    },
-                    array_values($orderArr["cars"])
-                ),
-                $orderArr["createdAt"],
-                $orderArr["updatedAt"]
-            )
-        );
+        return $this->createOrdersFromArrayFetched($arrayFetched)[0];
     }
 
     public function findByClientId(string $clientId): array
@@ -475,5 +308,96 @@ class MySqlOrderSource implements OrderSourceInterface
         );
         $statement->bindValue("id", $id);
         $statement->execute();
+    }
+
+    private function createOrdersFromArrayFetched($arrayFetched)
+    {
+        $orderIdArr = [];
+
+        foreach ($arrayFetched as $fetched) {
+            if (array_key_exists($fetched["orderId"], $orderIdArr)) {
+                $orderIdArr[$fetched["orderId"]]["cars"][$fetched["carId"]] =
+                    [
+                        "car" => [
+                            "id" => $fetched["carId"],
+                            "price" => $fetched["carPrice"],
+                            "inStock" => $fetched["carInStock"],
+                            "name" => $fetched["carName"],
+                            "createdAt" => $fetched["carCreatedAt"],
+                            "updatedAt" => $fetched["carUpdatedAt"],
+                        ],
+                        "quantity" => $fetched["quantity"]
+                    ]
+                ;
+            } else {
+                $orderIdArr[$fetched["orderId"]] = [
+                    "id" => $fetched["orderId"],
+                    "clientId" => $fetched["clientId"],
+                    "createdAt" => $fetched["orderCreatedAt"],
+                    "updatedAt" => $fetched["orderUpdatedAt"],
+                    "client" => [
+                        "id" => $fetched["clientId"],
+                        "name" => $fetched["clientName"],
+                        "contact" => $fetched["clientContact"],
+                        "createdAt" => $fetched["clientCreatedAt"],
+                        "updatedAt" => $fetched["clientUpdatedAt"],
+                    ],
+                    "cars" => [
+                        $fetched["carId"] => [
+                            "car" => [
+                                "id" => $fetched["carId"],
+                                "price" => $fetched["carPrice"],
+                                "inStock" => $fetched["carInStock"],
+                                "name" => $fetched["carName"],
+                                "createdAt" => $fetched["carCreatedAt"],
+                                "updatedAt" => $fetched["carUpdatedAt"],
+                            ],
+                            "quantity" => $fetched["quantity"]
+                        ],
+                    ]
+                ];
+            }
+        }
+
+        return array_values(
+            array_map(
+                function ($orderArr) {
+                    return (
+                        new OrderModel(
+                            $orderArr["id"],
+                            new ClientModel(
+                                $orderArr["client"]["id"],
+                                $orderArr["client"]["name"],
+                                $orderArr["client"]["contact"],
+                                $orderArr["client"]["createdAt"],
+                                $orderArr["client"]["updatedAt"]
+                            ),
+                            array_map(
+                                function ($carIdArr) {
+                                            $car = $carIdArr["car"];
+                                            $quantity = $carIdArr["quantity"];
+
+                                            return [
+                                                "car" => new CarModel(
+                                                    $car["id"],
+                                                    $car["name"],
+                                                    $car["price"],
+                                                    $car["inStock"],
+                                                    $car["createdAt"],
+                                                    $car["updatedAt"],
+                                                ),
+                                                "quantity" => $quantity
+                                            ];
+                                        },
+                                array_values($orderArr["cars"])
+                            ),
+                            $orderArr["createdAt"],
+                            $orderArr["updatedAt"]
+                        )
+                    );
+                },
+                $orderIdArr
+            )
+        );
     }
 }
