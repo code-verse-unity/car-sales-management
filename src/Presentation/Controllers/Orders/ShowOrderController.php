@@ -47,7 +47,7 @@ class ShowOrderController
             $order = $useCaseResult;
 
             $response->renderView(
-                "showOrderView",
+                "orders/showOrderView",
                 [
                     "order" => $order,
                 ]

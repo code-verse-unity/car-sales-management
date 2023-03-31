@@ -4,7 +4,7 @@
 
 <?php
 ob_start();
-require_once __DIR__ . "/_bill.php"; // a preview of the bill
+require_once __DIR__ . "/../_bill.php"; // a preview of the bill
 echo ob_get_clean();
 ?>
 

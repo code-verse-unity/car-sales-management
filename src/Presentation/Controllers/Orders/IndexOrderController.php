@@ -52,7 +52,7 @@ class IndexOrderController
             $endAtValue = $query["endAt"] ? new DateTime($query["endAt"]) : null;
 
             $response->renderView(
-                "indexOrderView",
+                "orders/indexOrderView",
                 [
                     "startAt" => $startAtValue,
                     "endAt" => $endAtValue,
