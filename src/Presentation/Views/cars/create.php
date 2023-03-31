@@ -2,57 +2,83 @@
 // ! be aware, $car can exists or not, depending on the controller that uses this view
 ?>
 
-<!-- <form action="<?= "/cars/create" ?>" method="POST">
-    <label for="name">Name</label>
-    <input type="text" name="name" id="name" value="<?= $car["name"] ?? "" ?>">
+<main class="container d-flex flex-column justify-content-center align-items-center py-4 w-75">
+    <h1 class="display-6 fw-bold ">Ajouter une nouvelle <span class="text-orange">Voiture</span>.</h1>
 
-    <?php if (isset($car["errors"]["name"])) : ?>
-        <span style="color:red;">
-            <?= $car["errors"]["name"][0] ?>
-        </span>
-    <?php endif; ?>
-
-    <label for="price">Prix</label>
-    <input type="number" name="price" id="price" value="<?= $car["price"] ?? "" ?>">
-
-    <?php if (isset($car["errors"]["price"])) : ?>
-        <span style="color:red;">
-            <?= $car["errors"]["price"][0] ?>
-        </span>
-    <?php endif; ?>
-
-    <label for="inStock">Stock</label>
-    <input type="number" name="inStock" id="inStock" value="<?= $car["inStock"] ?? "" ?>">
-
-    <?php if (isset($car["errors"]["inStock"])) : ?>
-        <span style="color:red;">
-            <?= $car["errors"]["inStock"][0] ?>
-        </span>
-    <?php endif; ?>
-
-    <input type="submit" value="Créer">
-    <a href="/cars">Annuler</a>
-</form> -->
-
-<main class="container d-flex flex-column justify-content-center py-4 w-75">
-    <h1 class="display-5 fw-bold">Ajouter une nouvelle <span class="text-orange">Voiture</span>.</h1>
-
-    <form action="" class="d-flex flex-column gap-2 py-3">
+    <form action="<?= "/cars" ?>" method="post" class="d-flex flex-column gap-2 py-3 w-75" novalidate>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Désignation de la voiture</label>
-            <input type="email" class="form-control p-3 rounded-3" id="exampleFormControlInput1" placeholder="Ferrari">
+            <input type="text" name="name" class="form-control p-3 rounded-3" id="exampleFormControlInput1" placeholder="Ferrari">
+            <div class="invalid-feedback">
+                Le nom de la voiture est obligatoire.
+            </div>
         </div>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Prix en Ariary</label>
-            <input type="number" class="form-control p-3 rounded-3" id="exampleFormControlInput1" placeholder="50000000">
+            <input type="number" name="price" class="form-control p-3 rounded-3" id="exampleFormControlInput1" placeholder="50000000">
+            <div class="invalid-feedback">
+                Veuillez entrer un prix correct.
+            </div>
         </div>
         <div class="mb-3">
-            <label for="exampleFormControlInput1" class="form-label">Nombre en Stock</label>
-            <input type="number" class="form-control p-3 rounded-3" id="exampleFormControlInput1" placeholder="10">
+            <label for="stockNumber" class="form-label">Nombre en Stock</label>
+            <input type="number" name='inStock' class="form-control p-3 rounded-3" id="stockNumber" placeholder="10">
+            <div class="invalid-feedback">
+                Veuillez indiquer le nombre de voitures disponible et il doit être supérieur à 0.
+            </div>
         </div>
-        <button class="btn btn-primary">
+        <button class="btn btn-primary mt-2">
             Enregistrer
         </button>
     </form>
 
 </main>
+
+<script>
+    const nameInput = document.querySelector("input[name='name']");
+    const priceInput = document.querySelector("input[name='price']");
+    const inStockInput = document.querySelector("input[name='inStock']");
+
+    nameInput.addEventListener("input", (e) => {
+        const value = e.target.value;
+        if (value.length < 3 || value === '') {
+            nameInput.classList.add("is-invalid");
+        } else {
+            nameInput.classList.remove("is-invalid");
+        }
+    });
+
+    priceInput.addEventListener("input", (e) => {
+        const value = e.target.value;
+
+        if (value === '' || isNaN(value) || value < 0) {
+            priceInput.classList.add("is-invalid");
+        } else {
+            priceInput.classList.remove("is-invalid");
+        }
+    });
+
+    inStockInput.addEventListener("input", (e) => {
+        const value = e.target.value;
+        if (value === '' || isNaN(value) || value <= 0) {
+            inStockInput.classList.add("is-invalid");
+        } else {
+            inStockInput.classList.remove("is-invalid");
+        }
+    });
+
+    const form = document.querySelector("form");
+    form.addEventListener("submit", (e) => {
+        const inputs = form.querySelectorAll("input");
+        Array.from(inputs).forEach(input => {
+            if (input.value === '') {
+                input.classList.add("is-invalid");
+            }
+        })
+
+        const hasError = Array.from(inputs).some((input) => input.classList.contains("is-invalid"));
+        if (hasError) {
+            e.preventDefault();
+        }
+    });
+</script>
