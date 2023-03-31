@@ -18,8 +18,8 @@
 
 
     <?php if (empty($clients)) : ?>
-      <div class="row my-3 py-3 px-2 bg-white rounded-3 shadow-sm">
-        <div class="col d-flex align-items-center fw-bold">Aucun client enregistré</div>
+      <div class="d-flex justify-content-center p-5">
+        <h3 class="text-center">Aucun client n'a été enregistré.</h3>
       </div>
     <?php else : ?>
       <?php foreach ($clients as $client) : ?>

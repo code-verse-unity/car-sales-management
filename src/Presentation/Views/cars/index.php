@@ -56,8 +56,8 @@
         </div>
 
         <?php if (empty($cars)) : ?>
-            <div class="row my-3 py-3 px-2 bg-white rounded-3 shadow-sm">
-                <div class="col d-flex align-items-center fw-bold">Aucune voiture enregistrée</div>
+            <div class="d-flex justify-content-center p-5">
+                <h3 class="text-center">Aucune voiture n'a été enregistrée.</h3>
             </div>
         <?php else : ?>
             <?php foreach ($cars as $car) : ?>
