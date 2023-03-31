@@ -22,7 +22,6 @@ class UpdateCarController
     {
         $body = $request->body;
         $params = $request->params;
-
         $useCaseResult = $this->updateCarUseCase->execute(
             $params["carId"],
             $body["name"],
@@ -50,7 +49,7 @@ class UpdateCarController
             $car = $useCaseResult;
 
             if (empty($car["errors"])) {
-                $response->redirect("/cars/" . $car["id"]);
+                $response->redirect("/cars");
             } else {
                 $response->setStatusCode(400);
 
