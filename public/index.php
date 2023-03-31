@@ -89,8 +89,6 @@ $app = new Application();
 
 $app->router->post("/users", [$storeUserController, "execute"]);
 
-$app->router->get("/clients", [$indexClientController, "execute"]);
-$app->router->post("/clients", [$storeClientController, "execute"]);
 
 /*
 This is the path to update a client,
@@ -98,8 +96,14 @@ The clientId is automatically in $request->params.
 So there is no need to add id in the body of the request, it won't be used
 */
 $app->router->get('/', [$homeController, 'execute']);
+// List all clients
+$app->router->get("/clients", [$indexClientController, "execute"]);
+// Show the view to create a new client
 $app->router->get("/clients/add", [$createClientController, "execute"]);
+// Update a client
 $app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
+// Store a new client
+$app->router->post("/clients", [$storeClientController, "execute"]);
 
 // Car routes
 // change POST /cars to POST /cars/create to make getting the form page and posting it to the same path, only the method differs
