@@ -20,6 +20,3 @@
 
 # Ignore vscode
 .vscode
-
-# Private folder
-/private

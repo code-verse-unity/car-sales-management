@@ -38,4 +38,9 @@ class CarRepository implements CarRepositoryInterface
     {
         $this->source->update($id, $name, $price, $inStock, $createdAt, $updatedAt);
     }
+
+    public function findByMinInStock(int $minInStock): array
+    {
+        return $this->source->findByMinInStock($minInStock);
+    }
 }

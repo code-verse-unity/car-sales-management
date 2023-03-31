@@ -83,4 +83,37 @@ class MySqlCarSource implements CarSourceInterface
 
         $statement->execute();
     }
+
+    public function findByMinInStock(int $minInStock): array
+    {
+        $order = "name";
+        $statement = $this->pdo->prepare(
+            "SELECT
+                *
+            FROM " . CarModel::TABLE_NAME .
+                " WHERE inStock >= :minInStock
+            ORDER BY " .
+                $order .
+                ";"
+        );
+
+        $statement->bindValue("minInStock", $minInStock);
+        $statement->execute();
+
+        $clientFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_map(
+            function ($car) {
+                return new CarModel(
+                    $car["id"],
+                    $car["name"],
+                    $car["price"],
+                    $car["inStock"],
+                    $car["createdAt"],
+                    $car["updatedAt"]
+                );
+            },
+            $clientFetched
+        );
+    }
 }
