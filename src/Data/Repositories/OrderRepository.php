@@ -7,7 +7,7 @@ use App\Data\Sources\Orders\OrderSourceInterface;
 use App\Domain\Repositories\OrderRepositoryInterface;
 use DateTime;
 
-class UserRepository implements OrderRepositoryInterface
+class OrderRepository implements OrderRepositoryInterface
 {
     private OrderSourceInterface $source;
 
@@ -31,18 +31,18 @@ class UserRepository implements OrderRepositoryInterface
         return $this->source->findByClientId($clientId);
     }
 
-    public function findByCarId(string $carId): array
+    public function save(string $id, string $clientId, array $orderCarsIds, array $carsIds, array $quantities, string $createdAt, string $updatedAt): void
     {
-        return $this->source->findByCarId($carId);
+        $this->source->save($id, $clientId, $orderCarsIds, $carsIds, $quantities, $createdAt, $updatedAt);
     }
 
-    public function save(string $id, string $clientId, string $carId, int $quantity, string $createdAt, string $updatedAt): void
+    public function update(string $id, string $clientId, array $orderCarsIds, array $carsIds, array $quantities, string $createdAt, string $updatedAt): void
     {
-        $this->source->save($id, $clientId, $carId, $quantity, $createdAt, $updatedAt);
+        $this->source->update($id, $clientId, $orderCarsIds, $carsIds, $quantities, $createdAt, $updatedAt);
     }
 
-    public function update(string $id, string $clientId, string $carId, int $quantity, string $createdAt, string $updatedAt): void
+    public function delete(string $id): void
     {
-        $this->source->update($id, $clientId, $carId, $quantity, $createdAt, $updatedAt);
+        $this->source->delete($id);
     }
 }

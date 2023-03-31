@@ -10,18 +10,27 @@ class Request
 
     public function __construct()
     {
-        if (in_array($this->getMethod(), ["GET", "HEAD"])) {
-            $this->query = $this->sanitizeGetData($_GET);
-        }
+        $this->query = $this->sanitizeGetData($_GET);
 
         if (in_array($this->getMethod(), ["POST", "PUT", "PATCH", "DELETE"])) {
-            $this->query = $this->sanitizeGetData($_GET);
+            // Get the raw HTTP request body
+            $request_body = file_get_contents('php://input');
 
-            if ($this->getMethod() === 'PUT') {
-                $this->body = $this->getPutBody();;
+            // Check the content type of the request
+            $content_type = $_SERVER['CONTENT_TYPE'];
+
+            if (strpos($content_type, 'application/json') !== false) {
+                // Handle JSON request body
+                $data = json_decode($request_body, true);
+            } elseif (strpos($content_type, 'application/xml') !== false) {
+                // Handle XML request body
+                $data = simplexml_load_string($request_body);
             } else {
-                $this->body = $this->sanitizePostData($_POST);
+                // Handle urlencoded request body
+                $data = $this->formatRawBody($request_body);
             }
+
+            $this->body = $data;
         }
     }
 
@@ -67,10 +76,9 @@ class Request
         return $_SERVER["uri"];
     }
 
-    function getPutBody()
+    function formatRawBody($rawBody)
     {
-        $rawBody = file_get_contents('php://input');
-        $formatedBody = array();
+        $keyValues = [];
 
         if (!empty($rawBody)) {
             $params = explode('&', $rawBody);
@@ -78,11 +86,27 @@ class Request
             foreach ($params as $param) {
                 $param_array = explode('=', $param);
                 if (count($param_array) === 2) {
-                    $formatedBody[urldecode($param_array[0])] = urldecode($param_array[1]);
+                    $key = urldecode($param_array[0]);
+                    $value = urldecode($param_array[1]);
+
+                    if (array_key_exists($key, $keyValues)) {
+                        $keyValues[$key][] = $value;
+                    } else {
+                        $keyValues[$key] = [$value];
+                    }
                 }
             }
         }
 
-        return $formatedBody;
+        return array_map(
+            function ($values) {
+                if (count($values) === 1) {
+                    return $values[0];
+                } else {
+                    return $values;
+                }
+            },
+            $keyValues
+        );
     }
 }
