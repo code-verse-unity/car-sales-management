@@ -55,7 +55,7 @@ class UpdateCarController
                 $response->setStatusCode(400);
 
                 $response->renderView(
-                    "editCarView",
+                    "cars/edit",
                     [
                         "car" => $car
                     ]

@@ -33,7 +33,7 @@ class IndexClientController
         $response->renderView("_500", ["fatalError" => $useCaseResult->getRaw()]);
       }
     } else {
-      $response->renderView("clients", ["clients" => $useCaseResult]);
+      $response->renderView("clients/index", ["clients" => $useCaseResult]);
     }
   }
 }

@@ -48,7 +48,7 @@ class EditCarController
             $car = $useCaseResult;
 
             $response->renderView(
-                "editCarView",
+                "cars/edit",
                 [
                     "car" => $car
                 ]
