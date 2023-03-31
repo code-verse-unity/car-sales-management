@@ -12,8 +12,6 @@ class m_2023_03_24_08_33_00_orders
         " (
                 id VARCHAR(255) PRIMARY KEY UNIQUE NOT NULL,
                 clientId VARCHAR(255) NOT NULL,
-                carId VARCHAR(255) NOT NULL,
-                quantity INT NOT NULL,
                 createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
             );"
