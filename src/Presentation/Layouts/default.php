@@ -3,8 +3,10 @@
 
 function activeLink(string $link)
 {
-    $url = $_SERVER['REQUEST_URI'];
+    $url = $_SERVER['PATH_INFO'];
     if ($url === '/' . strtolower($link)) {
+        return "class='nav-link app-nav-link fw-bold'";
+    } else if ($url === null && $link === '') {
         return "class='nav-link app-nav-link fw-bold'";
     } else {
         return  "class='nav-link text-secondary'";
