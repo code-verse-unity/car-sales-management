@@ -10,6 +10,19 @@
         </div>
     </div>
 
+    <!-- Search functionality, already handled by IndexCarUseCase and IndexCarController -->
+    <form action="/cars" class="container d-flex py-3 gap-3">
+        <input type="search" name="name" id="id" placeholder="ex: Audi" value="<?= $nameQuery ?? "" ?>" class="form-control">
+
+        <input type="submit" value="Rechercher" class="btn btn-primary">
+
+        <a href="/cars">
+            <button class="btn">
+                Effacer
+            </button>
+        </a>
+    </form>
+
     <div class="container">
         <div class="row pt-3">
             <div class="col">Désignation</div>
