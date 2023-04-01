@@ -2,43 +2,6 @@
 
 ?>
 
-<!-- Search functionality, already handled by IndexCarUseCase and IndexCarController -->
-<!-- <form action="/cars">
-    <input type="search" name="name" id="id" value="<?= $nameQuery ?? "" ?>">
-
-    <input type="submit" value="Search">
-
-    <a href="/cars">Effacer</a>
-</form>
-
-<?php if (count($cars) === 0) : ?>
-    <p>
-        <?php if ($nameQuery) : ?>
-            Il n'y a pas de voitures correspondant à votre recherche.
-        <?php else : ?>
-            Il n'y a pas encore de voitures.
-        <?php endif; ?>
-    </p>
-<?php else : ?>
-    <ul>
-        <?php foreach ($cars as $car) : ?>
-            <li>
-                <pre>
-                    <?php
-                    print_r($car);
-                    ?>
-                </pre>
-
-                <a href="<?= "/cars/" . $car["id"] ?>">Voir les détails</a>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-<?php endif; ?> -->
-
-<?php
-
-?>
-
 <main class="py-4">
     <div class="d-flex justify-content-between align-items-center">
         <h1 class="display-4 fw-bold">Liste des <span class="text-orange">Voitures</span>.</h1>
@@ -46,6 +9,19 @@
             <button class="btn btn-primary" id='add-car'>Ajouter</button>
         </div>
     </div>
+
+    <!-- Search functionality, already handled by IndexCarUseCase and IndexCarController -->
+    <form action="/cars" class="container d-flex py-3 gap-3">
+        <input type="search" name="name" id="id" placeholder="ex: Audi" value="<?= $nameQuery ?? "" ?>" class="form-control">
+
+        <input type="submit" value="Rechercher" class="btn btn-primary">
+
+        <a href="/cars">
+            <button class="btn">
+                Effacer
+            </button>
+        </a>
+    </form>
 
     <div class="container">
         <div class="row pt-3">
