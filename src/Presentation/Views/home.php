@@ -48,10 +48,10 @@
   });
 
   cars.addEventListener('click', () => {
-    window.location.href = '/voitures';
+    window.location.href = '/cars';
   });
 
   orders.addEventListener('click', () => {
-    window.location.href = '/achats';
+    window.location.href = '/orders';
   });
 </script>

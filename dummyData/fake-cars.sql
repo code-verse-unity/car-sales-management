@@ -1,0 +1,16 @@
+INSERT INTO cars (id, name, price, inStock) VALUES 
+  ('CAR001', 'Honda Civic', 22000000, 5),
+  ('CAR002', 'Ford Mustang', 35000000, 0),
+  ('CAR003', 'Chevrolet Corvette', 65000000, 3),
+  ('CAR004', 'Tesla Model S', 80000000, 0),
+  ('CAR005', 'BMW X3', 45000000, 2),
+  ('CAR006', 'Audi A4', 40000000, 0),
+  ('CAR007', 'Mercedes-Benz E-Class', 55000000, 4),
+  ('CAR008', 'Jeep Wrangler', 35000000, 8),
+  ('CAR009', 'Nissan Altima', 25000000, 6),
+  ('CAR010', 'Toyota Highlander', 40000000, 0),
+  ('CAR011', 'Porsche 911', 95000000, 0),
+  ('CAR012', 'Volvo XC60', 50000000, 2),
+  ('CAR013', 'Cadillac Escalade', 80000000, 0),
+  ('CAR014', 'Mazda CX-5', 30000000, 7),
+  ('CAR015', 'Subaru Outback', 28000000, 0);
