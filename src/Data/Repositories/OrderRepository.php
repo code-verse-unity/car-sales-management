@@ -45,4 +45,24 @@ class OrderRepository implements OrderRepositoryInterface
     {
         $this->source->delete($id);
     }
+
+    public function getCount(): int
+    {
+        return $this->source->getCount();
+    }
+
+    public function getCountByLastMonths(int $lastMonths): int
+    {
+        return $this->source->getCountByLastMonths($lastMonths);
+    }
+
+    public function getRevenue(): int
+    {
+        return $this->source->getRevenue();
+    }
+
+    public function getRevenueByLastMonths(int $lastMonths): int
+    {
+        return $this->source->getRevenueByLastMonths($lastMonths);
+    }
 }
