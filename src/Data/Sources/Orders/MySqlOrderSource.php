@@ -211,7 +211,8 @@ class MySqlOrderSource implements OrderSourceInterface
         array $orderCarsIds,
         array $carsIds,
         array $quantities,
-        string $createdAt, string $updatedAt
+        string $createdAt,
+        string $updatedAt
     ): void {
         $orderTableName = OrderModel::TABLE_NAME;
         $orderCarsTableName = "order_cars";
@@ -327,8 +328,7 @@ class MySqlOrderSource implements OrderSourceInterface
                             "updatedAt" => $fetched["carUpdatedAt"],
                         ],
                         "quantity" => $fetched["quantity"]
-                    ]
-                ;
+                    ];
             } else {
                 $orderIdArr[$fetched["orderId"]] = [
                     "id" => $fetched["orderId"],
@@ -362,8 +362,7 @@ class MySqlOrderSource implements OrderSourceInterface
         return array_values(
             array_map(
                 function ($orderArr) {
-                    return (
-                        new OrderModel(
+                    return (new OrderModel(
                             $orderArr["id"],
                             new ClientModel(
                                 $orderArr["client"]["id"],
@@ -374,21 +373,21 @@ class MySqlOrderSource implements OrderSourceInterface
                             ),
                             array_map(
                                 function ($carIdArr) {
-                                            $car = $carIdArr["car"];
-                                            $quantity = $carIdArr["quantity"];
+                                    $car = $carIdArr["car"];
+                                    $quantity = $carIdArr["quantity"];
 
-                                            return [
-                                                "car" => new CarModel(
-                                                    $car["id"],
-                                                    $car["name"],
-                                                    $car["price"],
-                                                    $car["inStock"],
-                                                    $car["createdAt"],
-                                                    $car["updatedAt"],
-                                                ),
-                                                "quantity" => $quantity
-                                            ];
-                                        },
+                                    return [
+                                        "car" => new CarModel(
+                                            $car["id"],
+                                            $car["name"],
+                                            $car["price"],
+                                            $car["inStock"],
+                                            $car["createdAt"],
+                                            $car["updatedAt"],
+                                        ),
+                                        "quantity" => $quantity
+                                    ];
+                                },
                                 array_values($orderArr["cars"])
                             ),
                             $orderArr["createdAt"],
@@ -398,6 +397,113 @@ class MySqlOrderSource implements OrderSourceInterface
                 },
                 $orderIdArr
             )
+        );
+    }
+
+    public function getCount(): int
+    {
+        $orderTableName = OrderModel::TABLE_NAME;
+
+        $statement = $this->pdo->prepare(
+            "SELECT COUNT(*) AS ordersCount FROM $orderTableName;"
+        );
+
+        $statement->execute();
+
+        $fetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return $fetched[0]["ordersCount"];
+    }
+
+    public function getCountByLastMonths(int $lastMonths): int
+    {
+        $orderTableName = OrderModel::TABLE_NAME;
+
+        $statement = $this->pdo->prepare(
+            "SELECT
+                COUNT(*) AS ordersCount
+            FROM $orderTableName
+            WHERE
+                createdAt >= DATE_SUB(
+                    CURDATE(),
+                    INTERVAL :lastMonths MONTH
+                );"
+        );
+
+        $statement->bindValue("lastMonths", $lastMonths);
+
+        $statement->execute();
+
+        $fetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return $fetched[0]["ordersCount"];
+    }
+
+    public function getRevenue(): int
+    {
+        $orderTableName = OrderModel::TABLE_NAME;
+        $carTableName = CarModel::TABLE_NAME;
+        $orderCarsTableName = "order_cars";
+
+        $statement = $this->pdo->prepare(
+            "SELECT
+                $carTableName.price,
+                $orderCarsTableName.quantity
+            FROM $orderTableName
+            INNER JOIN $orderCarsTableName
+                ON $orderTableName.id = $orderCarsTableName.orderId
+            INNER JOIN $carTableName
+                ON $orderCarsTableName.carId = $carTableName.id
+            ;"
+        );
+
+        $statement->execute();
+
+        $arrayFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_reduce(
+            $arrayFetched,
+            function ($prev, $priceQuantity) {
+                return $prev + $priceQuantity["price"] * $priceQuantity["quantity"];
+            },
+            0
+        );
+    }
+
+    public function getRevenueByLastMonths(int $lastMonths): int
+    {
+        $orderTableName = OrderModel::TABLE_NAME;
+        $carTableName = CarModel::TABLE_NAME;
+        $orderCarsTableName = "order_cars";
+
+        $statement = $this->pdo->prepare(
+            "SELECT
+                $carTableName.price,
+                $orderCarsTableName.quantity
+            FROM $orderTableName
+            INNER JOIN $orderCarsTableName
+                ON $orderTableName.id = $orderCarsTableName.orderId
+            INNER JOIN $carTableName
+                ON $orderCarsTableName.carId = $carTableName.id
+            WHERE
+                $orderTableName.createdAt >= DATE_SUB(
+                    CURDATE(),
+                    INTERVAL :lastMonths MONTH
+                );"
+        );
+
+        $statement->bindValue("lastMonths", $lastMonths);
+
+        $statement->execute();
+
+        $arrayFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_reduce(
+            $arrayFetched,
+            function ($prev, $priceQuantity) {
+                return $prev + $priceQuantity["price"] * $priceQuantity["quantity"];
+            },
+            0
         );
     }
 }
