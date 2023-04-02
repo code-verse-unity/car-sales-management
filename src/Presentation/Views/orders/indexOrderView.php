@@ -6,13 +6,13 @@
 
 <main class="py-4">
     <div class="d-flex justify-content-between align-items-center">
-        <h1 class="display-4 fw-bold">Liste des <span class="text-orange">Achats</span> effectuées.</h1>
+        <h1 class="fw-bold">Liste des <span class="text-orange">Achats</span> effectuées.</h1>
         <div>
-            <button class="btn btn-primary">Ajouter</button>
+            <button class="btn btn-primary" id='add-order'>Ajouter</button>
         </div>
     </div>
 
-    <div class="py-3">
+    <div class="py-4 px-2 my-2 border rounded-3 search-container">
         <form action="/orders" method="GET" id="search" class="container d-flex gap-3" novalidate>
             <div>
                 <label for="startAt" class="py-1">Début</label>
@@ -32,7 +32,7 @@
 
             <div class="align-self-end ml-2">
                 <a href="/orders">
-                    <button class="btn" type="button">
+                    <button class="btn " type="button ">
                         Effacer
                     </button>
                 </a>
@@ -150,7 +150,7 @@
     <?php else : ?>
         <div class="container">
             <div class="row pt-3">
-                <div class="col">Identifiant</div>
+                <div class="col-3">Identifiant</div>
                 <div class="col">Nom du client</div>
                 <div class="col">Voitures</div>
                 <div class="col">Quantité</div>
@@ -158,19 +158,19 @@
             </div>
             <?php foreach ($orders as $order) : ?>
                 <div class="row my-3 py-3 px-2 bg-white rounded-3 shadow-sm">
-                    <div class="col d-flex align-items-center fw-bold"><?= $order['id'] ?></div>
-                    <div class="col d-flex align-items-center"><?= $order['client']['name'] ?></div>
-                    <div class="col d-flex align-items-center">
+                    <div class="col-3 d-flex align-items-center align-self-start"><?= $order['id'] ?></div>
+                    <div class="col d-flex align-items-center align-self-start fw-bold"><?= $order['client']['name'] ?></div>
+                    <div class="col pt-2">
                         <?php foreach ($order['cars'] as $car) : ?>
-                            <div> <?= $car['name'] ?></div>
+                            <div class="mb-2"> <?= $car['name'] ?></div>
                         <?php endforeach; ?>
                     </div>
-                    <div class="col d-flex align-items-center">
+                    <div class="col pt-2">
                         <?php foreach ($order['quantities'] as $quantity) : ?>
-                            <div> <?= $quantity ?></div>
+                            <div class="mb-2"> <?= $quantity ?></div>
                         <?php endforeach; ?>
                     </div>
-                    <div class="col d-flex justify-content-end">
+                    <div class="col d-flex justify-content-end align-self-start">
                         <button class="btn btn-primary mx-3">
                             <img src="/assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
                         </button>
@@ -188,3 +188,11 @@
 
 
 </main>
+
+<script>
+    const addOrderButton = document.getElementById('add-order');
+    addOrderButton.addEventListener('click', e => {
+        console.log('c');
+        window.location.href = '/orders/create';
+    })
+</script>

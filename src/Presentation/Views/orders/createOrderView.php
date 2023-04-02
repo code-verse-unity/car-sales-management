@@ -247,6 +247,7 @@ function carsToJSCars($cars)
 
 <script>
     const validateInputs = () => {
+        const inputs = document.querySelectorAll('input');
         const hasError = Array.from(inputs).some((input) => input.classList.contains("is-invalid"));
         if (hasError) {
             invalidFeedback[0].style.display = 'block'
