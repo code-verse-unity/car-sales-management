@@ -66,10 +66,15 @@
 
     <?php endif; ?>
 
-
 </main>
 
+
 <script>
+    const addClientButton = document.getElementById('add-car');
+    addClientButton.addEventListener('click', () => {
+        window.location.href = '/cars/add';
+    });
+
     const form = document.getElementById('search');
     const searchInput = document.getElementById('searchInput');
 
