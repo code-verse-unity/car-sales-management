@@ -5,7 +5,7 @@
   <div class="d-flex justify-content-between align-items-center">
     <h1 class="display-4 fw-bold">Liste des <span class="text-orange">Clients</span>.</h1>
     <div>
-      <button class="btn btn-primary">Ajouter</button>
+      <button class="btn btn-primary" id='add-client'>Ajouter</button>
     </div>
   </div>
 
@@ -40,3 +40,10 @@
   </div>
 
 </main>
+
+<script>
+  const addClientButton = document.getElementById('add-client');
+  addClientButton.addEventListener('click', () => {
+    window.location.href = '/clients/add';
+  });
+</script>

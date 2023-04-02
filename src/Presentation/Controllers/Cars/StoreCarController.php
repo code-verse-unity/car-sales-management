@@ -48,9 +48,8 @@ class StoreCarController
             }
         } else {
             $car = $useCaseResult;
-
             if (empty($car["errors"])) {
-                $response->redirect("/cars/" . $car["id"]);
+                $response->redirect("/cars");
             } else {
                 $response->renderView(
                     "cars/create",
