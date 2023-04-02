@@ -35,6 +35,15 @@
       </div>
     </div>
   </div>
+
+  <pre>
+    <?php var_dump($clientsCount); ?>
+    <?php var_dump($carsCount); ?>
+    <?php var_dump($ordersCount); ?>
+    <?php var_dump($ordersCountForLast6Months); ?>
+    <?php var_dump($revenue); ?>
+    <?php var_dump($revenueOfLast6Months); ?>
+  </pre>
 </main>
 
 <!-- Js script to handle navigation to /clients /cars and /orders -->

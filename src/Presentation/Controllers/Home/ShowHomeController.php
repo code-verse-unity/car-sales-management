@@ -33,7 +33,7 @@ class ShowHomeController
       $response->renderView(
         "home",
         [
-          "clientCount" => $useCaseResult["clientCount"],
+          "clientsCount" => $useCaseResult["clientCount"],
           "carsCount" => $useCaseResult["carsCount"],
           "ordersCount" => $useCaseResult["ordersCount"],
           "ordersCountForLast6Months" => $useCaseResult["ordersCountForLast6Months"],
