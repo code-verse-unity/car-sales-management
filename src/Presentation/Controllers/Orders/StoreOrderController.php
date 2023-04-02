@@ -25,8 +25,8 @@ class StoreOrderController
 
         $useCaseResult = $this->storeOrderUseCase->execute(
             $body["clientId"],
-            $body["carId"],
-            $body["quantity"]
+            $body["carsIds"],
+            $body["quantities"]
         );
 
         if ($useCaseResult instanceof Failure) {
