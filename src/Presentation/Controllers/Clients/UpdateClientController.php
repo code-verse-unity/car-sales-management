@@ -49,7 +49,7 @@ class UpdateClientController
         $indexClientUseCase = new IndexClientUseCase($this->updateClientUseCase->getRepository());
         $clients = $indexClientUseCase->execute();
 
-        $response->renderView("clients/index", ["clients" => $clients]);
+        $response->redirect("/clients");
       } else {
         // otherwise, we send the back the view for editing the client, with the raw client, its (invalid) values , and errors
         // the goal is to make an error state on the inputs (input with red border, error message on the bottom...)
