@@ -1,4 +1,5 @@
 <?php
+use App\Core\Utils\Strings\FormatCurrency;
 
 ?>
 <main class="py-2">
@@ -41,8 +42,8 @@
     <?php var_dump($carsCount); ?>
     <?php var_dump($ordersCount); ?>
     <?php var_dump($ordersCountForLast6Months); ?>
-    <?php var_dump($revenue); ?>
-    <?php var_dump($revenueOfLast6Months); ?>
+    <?php var_dump(FormatCurrency::format($revenue)); ?>
+    <?php var_dump(FormatCurrency::format($revenueOfLast6Months)); ?>
   </pre>
 </main>
 
