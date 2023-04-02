@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presentation\Controllers;
+namespace App\Presentation\Controllers\Home;
 
 use App\Core\Requests\Request;
 use App\Core\Responses\Response;

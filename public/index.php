@@ -29,7 +29,7 @@ use App\Data\UseCases\Bills\DownloadBillUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
-use App\Presentation\Controllers\HomeController;
+use App\Presentation\Controllers\Home\HomeController;
 use App\Presentation\Controllers\Users\StoreUserController;
 use App\Presentation\Controllers\Cars\StoreCarController;
 use App\Presentation\Controllers\Cars\ShowCarController;
