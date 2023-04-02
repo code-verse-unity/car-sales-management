@@ -180,7 +180,9 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-end ">
-                    <button class="btn btn-link">Télécharger la facture.</button>
+                    <a href="<?= "/bills/" . $order['id'] . '/download' ?>" class="btn btn-link">
+                        Télécharger la facture.
+                    </a>
                 </div>
             <?php endforeach; ?>
         </div>
