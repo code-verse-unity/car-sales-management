@@ -3,7 +3,7 @@
 
 <main class="py-4">
   <div class="d-flex justify-content-between align-items-center">
-    <h1 class="display-4 fw-bold">Liste des <span class="text-orange">Clients</span>.</h1>
+    <h1 class="fw-bold">Liste des <span class="text-orange">Clients</span>.</h1>
     <div>
       <button class="btn btn-primary" id='add-client'>Ajouter</button>
     </div>
@@ -27,9 +27,12 @@
           <div class="col d-flex align-items-center fw-bold"><?= $client['name'] ?></div>
           <div class="col d-flex align-items-center"><?= $client['contact'] ?></div>
           <div class="col d-flex justify-content-end">
-            <button class="btn btn-primary mx-3">
-              <img src="assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
-            </button>
+            <a href="<?= "/clients/" . $client['id'] . "/edit" ?>">
+              <button class="btn btn-primary mx-3">
+                <img src="assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
+              </button>
+            </a>
+
             <button class="btn btn-danger">
               <img src="assets/icons/delete.svg" alt="delete cars" srcset="" class="icon">
             </button>
