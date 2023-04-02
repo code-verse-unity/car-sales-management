@@ -116,4 +116,19 @@ class MySqlCarSource implements CarSourceInterface
             $clientFetched
         );
     }
+
+    public function getCount(): int
+    {
+        $carTableName = CarModel::TABLE_NAME;
+
+        $statement = $this->pdo->prepare(
+            "SELECT COUNT(*) AS carsCount FROM $carTableName;"
+        );
+
+        $statement->execute();
+
+        $fetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return $fetched[0]["carsCount"];
+    }
 }
