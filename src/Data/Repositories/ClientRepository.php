@@ -38,4 +38,9 @@ class ClientRepository implements ClientRepositoryInterface
     {
         $this->source->update($id, $name, $contact, $createdAt, $updatedAt);
     }
+
+    public function getCount(): int
+    {
+        return $this->source->getCount();
+    }
 }
