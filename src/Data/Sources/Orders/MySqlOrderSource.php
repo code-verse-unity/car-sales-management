@@ -143,66 +143,57 @@ class MySqlOrderSource implements OrderSourceInterface
 
     public function findByClientId(string $clientId): array
     {
-        /* $orderTableName = OrderModel::TABLE_NAME;
+        $orderTableName = OrderModel::TABLE_NAME;
         $clientTableName = ClientModel::TABLE_NAME;
         $carTableName = CarModel::TABLE_NAME;
+        $orderCarsTableName = "order_cars";
+
         $statement = $this->pdo->prepare(
-        "SELECT
-        $orderTableName.id AS orderId,
-        $orderTableName.clientId,
-        $orderTableName.carId,
-        $orderTableName.quantity,
-        $orderTableName.createdAt,
-        $orderTableName.updatedAt,
-        $clientTableName.name AS clientName,
-        $clientTableName.contact AS clientContact,
-        $clientTableName.createdAt AS clientCreatedAt,
-        $clientTableName.updatedAt AS clientUpdatedAt,
-        $carTableName.price AS carPrice,
-        $carTableName.inStock AS carInStock,
-        $carTableName.name AS carName,
-        $carTableName.createdAt AS carCreatedAt,
-        $carTableName.updatedAt AS carUpdatedAt
-        FROM $orderTableName
-        INNER JOIN $clientTableName
-        ON $orderTableName.clientId = $clientTableName.id
-        INNER JOIN $carTableName
-        ON $orderTableName.carId = $carTableName.id
-        WHERE $clientTableName.id = :clientId
-        ORDER BY
-        $orderTableName.createdAt DESC,
-        $clientTableName.name ASC,
-        $carTableName.name ASC;"
+            "SELECT
+                $orderTableName.id AS orderId,
+                $orderTableName.clientId,
+                $orderTableName.createdAt AS orderCreatedAt,
+                $orderTableName.updatedAt As orderUpdatedAt,
+                $clientTableName.id AS clientId,
+                $clientTableName.name AS clientName,
+                $clientTableName.contact AS clientContact,
+                $clientTableName.createdAt AS clientCreatedAt,
+                $clientTableName.updatedAt AS clientUpdatedAt,
+                $carTableName.id AS carId,
+                $carTableName.price AS carPrice,
+                $carTableName.inStock AS carInStock,
+                $carTableName.name AS carName,
+                $carTableName.createdAt AS carCreatedAt,
+                $carTableName.updatedAt AS carUpdatedAt,
+                $orderCarsTableName.quantity
+            FROM $orderTableName
+            INNER JOIN $clientTableName
+                ON $orderTableName.clientId = $clientTableName.id
+            INNER JOIN $orderCarsTableName
+                ON $orderTableName.id = $orderCarsTableName.orderId
+            INNER JOIN $carTableName
+                ON $orderCarsTableName.carId = $carTableName.id
+            WHERE $orderTableName.clientId = :clientId
+            ORDER BY
+                $orderTableName.createdAt DESC,
+                $clientTableName.name ASC,
+                $carTableName.name ASC
+            ;"
         );
+
         $statement->bindValue("clientId", $clientId);
+
         $statement->execute();
+
+        /*
+        ! if it's empty,
+        ! that means the clients didn't make any order
+        ! OR
+        ! the client doesn't exist at all
+        */
         $arrayFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
-        return array_map(function ($fetched) {
-        return (
-        new OrderModel(
-        $fetched["orderId"],
-        new ClientModel(
-        $fetched["clientId"],
-        $fetched["clientName"],
-        $fetched["clientContact"],
-        $fetched["clientCreatedAt"],
-        $fetched["clientUpdatedAt"]
-        ),
-        new CarModel(
-        $fetched["carId"],
-        $fetched["carName"],
-        $fetched["carPrice"],
-        $fetched["carInStock"],
-        $fetched["carCreatedAt"],
-        $fetched["carUpdatedAt"]
-        ),
-        $fetched["quantity"],
-        $fetched["createdAt"],
-        $fetched["updatedAt"]
-        )
-        )->getRaw();
-        }, $arrayFetched); */
-        return [];
+
+        return $this->createOrdersFromArrayFetched($arrayFetched);
     }
 
     public function save(
@@ -362,7 +353,8 @@ class MySqlOrderSource implements OrderSourceInterface
         return array_values(
             array_map(
                 function ($orderArr) {
-                    return (new OrderModel(
+                    return (
+                        new OrderModel(
                             $orderArr["id"],
                             new ClientModel(
                                 $orderArr["client"]["id"],
@@ -373,21 +365,21 @@ class MySqlOrderSource implements OrderSourceInterface
                             ),
                             array_map(
                                 function ($carIdArr) {
-                                    $car = $carIdArr["car"];
-                                    $quantity = $carIdArr["quantity"];
+                                            $car = $carIdArr["car"];
+                                            $quantity = $carIdArr["quantity"];
 
-                                    return [
-                                        "car" => new CarModel(
-                                            $car["id"],
-                                            $car["name"],
-                                            $car["price"],
-                                            $car["inStock"],
-                                            $car["createdAt"],
-                                            $car["updatedAt"],
-                                        ),
-                                        "quantity" => $quantity
-                                    ];
-                                },
+                                            return [
+                                                "car" => new CarModel(
+                                                    $car["id"],
+                                                    $car["name"],
+                                                    $car["price"],
+                                                    $car["inStock"],
+                                                    $car["createdAt"],
+                                                    $car["updatedAt"],
+                                                ),
+                                                "quantity" => $quantity
+                                            ];
+                                        },
                                 array_values($orderArr["cars"])
                             ),
                             $orderArr["createdAt"],
