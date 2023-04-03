@@ -29,6 +29,7 @@ use App\Data\UseCases\Orders\DestroyOrderUseCase;
 use App\Data\UseCases\Bills\DownloadBillUseCase;
 use App\Data\UseCases\Clients\ShowClientUseCase;
 use App\Data\UseCases\Home\ShowHomeUseCase;
+use App\Data\UseCases\Revenues\IndexRevenueUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
@@ -48,6 +49,7 @@ use App\Presentation\Controllers\Orders\ShowOrderController;
 use App\Presentation\Controllers\Orders\DestroyOrderController;
 use App\Presentation\Controllers\Bills\DownloadBillController;
 use App\Presentation\Controllers\Clients\EditClientController;
+use App\Presentation\Controllers\Revenues\IndexRevenueController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -134,6 +136,10 @@ $downloadBillController = new DownloadBillController($downloadBillUseCase);
 $showHomeUseCase = new ShowHomeUseCase($clientRepository, $carRepository, $orderRepository);
 $showHomeController = new ShowHomeController($showHomeUseCase);
 
+// Revenues
+$indexRevenueUseCase = new IndexRevenueUseCase($orderRepository);
+$indexRevenueController = new IndexRevenueController($indexRevenueUseCase);
+
 $app = new Application();
 
 $app->router->post("/users", [$storeUserController, "execute"]);
@@ -178,5 +184,8 @@ $app->router->get("/orders/{orderId}", [$showOrderController, "execute"]);
 
 // Bills routes
 $app->router->get("/bills/{orderId}/download", [$downloadBillController, "execute"]);
+
+// Revenue routes
+$app->router->get("/revenues", [$indexRevenueController, "execute"]);
 
 $app->run();
