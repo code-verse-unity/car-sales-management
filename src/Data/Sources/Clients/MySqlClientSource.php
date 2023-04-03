@@ -81,4 +81,19 @@ class MySqlClientSource implements ClientSourceInterface
 
         $statement->execute();
     }
+
+    public function getCount(): int
+    {
+        $clientTableName = ClientModel::TABLE_NAME;
+
+        $statement = $this->pdo->prepare(
+            "SELECT COUNT(*) AS clientsCount FROM $clientTableName;"
+        );
+
+        $statement->execute();
+
+        $fetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        return $fetched[0]["clientsCount"];
+    }
 }

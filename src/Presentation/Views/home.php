@@ -1,4 +1,5 @@
 <?php
+use App\Core\Utils\Strings\FormatCurrency;
 
 ?>
 <main class="py-2">
@@ -35,6 +36,15 @@
       </div>
     </div>
   </div>
+
+  <pre>
+    <?php var_dump($clientsCount); ?>
+    <?php var_dump($carsCount); ?>
+    <?php var_dump($ordersCount); ?>
+    <?php var_dump($ordersCountForLast6Months); ?>
+    <?php var_dump(FormatCurrency::format($revenue)); ?>
+    <?php var_dump(FormatCurrency::format($revenueOfLast6Months)); ?>
+  </pre>
 </main>
 
 <!-- Js script to handle navigation to /clients /cars and /orders -->

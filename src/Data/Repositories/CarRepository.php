@@ -25,6 +25,11 @@ class CarRepository implements CarRepositoryInterface
     {
         return $this->source->findById($id);
     }
+
+    public function getCount(): int {
+        return $this->source->getCount();
+    }
+
     public function findByName(string $name): array
     {
         return $this->source->findByName($name);

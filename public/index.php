@@ -27,10 +27,11 @@ use App\Data\UseCases\Orders\ShowOrderUseCase;
 use App\Data\UseCases\Orders\DestroyOrderUseCase;
 use App\Data\UseCases\Bills\DownloadBillUseCase;
 use App\Data\UseCases\Clients\ShowClientUseCase;
+use App\Data\UseCases\Home\ShowHomeUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
 use App\Presentation\Controllers\Clients\UpdateClientController;
-use App\Presentation\Controllers\HomeController;
+use App\Presentation\Controllers\Home\ShowHomeController;
 use App\Presentation\Controllers\Users\StoreUserController;
 use App\Presentation\Controllers\Cars\StoreCarController;
 use App\Presentation\Controllers\Cars\ShowCarController;
@@ -38,7 +39,6 @@ use App\Presentation\Controllers\Cars\CreateCarController;
 use App\Presentation\Controllers\Cars\IndexCarController;
 use App\Presentation\Controllers\Cars\UpdateCarController;
 use App\Presentation\Controllers\Cars\EditCarController;
-use App\Presentation\Controllers\Clients\CreateCarController as ClientsCreateCarController;
 use App\Presentation\Controllers\Clients\CreateClientController;
 use App\Presentation\Controllers\Orders\StoreOrderController;
 use App\Presentation\Controllers\Orders\CreateOrderController;
@@ -125,7 +125,11 @@ $destroyOrderController = new DestroyOrderController($destroyOrderUseCase);
 // Bills
 $downloadBillUseCase = new DownloadBillUseCase($orderRepository);
 $downloadBillController = new DownloadBillController($downloadBillUseCase);
-$homeController = new HomeController();
+
+// Home
+// ShowHomeUseCase and ShowHomeController
+$showHomeUseCase = new ShowHomeUseCase($clientRepository, $carRepository, $orderRepository);
+$showHomeController = new ShowHomeController($showHomeUseCase);
 
 $app = new Application();
 
@@ -137,7 +141,7 @@ This is the path to update a client,
 The clientId is automatically in $request->params.
 So there is no need to add id in the body of the request, it won't be used
 */
-$app->router->get('/', [$homeController, 'execute']);
+$app->router->get('/', [$showHomeController, 'execute']);
 // List all clients
 $app->router->get("/clients", [$indexClientController, "execute"]);
 // Show the view to create a new client
