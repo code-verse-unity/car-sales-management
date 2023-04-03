@@ -26,6 +26,7 @@ use App\Data\UseCases\Orders\IndexOrderUseCase;
 use App\Data\UseCases\Orders\ShowOrderUseCase;
 use App\Data\UseCases\Orders\DestroyOrderUseCase;
 use App\Data\UseCases\Bills\DownloadBillUseCase;
+use App\Data\UseCases\Clients\ShowClientUseCase;
 use App\Data\UseCases\Home\ShowHomeUseCase;
 use App\Presentation\Controllers\Clients\IndexClientController;
 use App\Presentation\Controllers\Clients\StoreClientController;
@@ -45,6 +46,7 @@ use App\Presentation\Controllers\Orders\IndexOrderController;
 use App\Presentation\Controllers\Orders\ShowOrderController;
 use App\Presentation\Controllers\Orders\DestroyOrderController;
 use App\Presentation\Controllers\Bills\DownloadBillController;
+use App\Presentation\Controllers\Clients\EditClientController;
 
 $dotenv = Dotenv::createImmutable(__DIR__ . "/../");
 $dotenv->load();
@@ -75,6 +77,9 @@ $updateClientUseCase = new UpdateClientUseCase($clientRepository);
 $updateClientController = new UpdateClientController($updateClientUseCase);
 // Create a new client view
 $createClientController = new CreateClientController();
+
+$showClientUseCase = new ShowClientUseCase($clientRepository);
+$editClientController = new EditClientController($showClientUseCase);
 
 // Car
 // Source and repository
@@ -141,8 +146,10 @@ $app->router->get('/', [$showHomeController, 'execute']);
 $app->router->get("/clients", [$indexClientController, "execute"]);
 // Show the view to create a new client
 $app->router->get("/clients/add", [$createClientController, "execute"]);
+// Show the view to update a client
+$app->router->get("/clients/{clientId}/edit", [$editClientController, 'execute']);
 // Update a client
-$app->router->put("/clients/{clientId}", [$updateClientController, "execute"]);
+$app->router->post("/clients/{clientId}/edit", [$updateClientController, "execute"]);
 // Store a new client
 $app->router->post("/clients", [$storeClientController, "execute"]);
 

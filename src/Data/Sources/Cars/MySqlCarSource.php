@@ -91,10 +91,10 @@ class MySqlCarSource implements CarSourceInterface
             "SELECT
                 *
             FROM " . CarModel::TABLE_NAME .
-            " WHERE inStock >= :minInStock
+                " WHERE inStock >= :minInStock
             ORDER BY " .
-            $order .
-            ";"
+                $order .
+                ";"
         );
 
         $statement->bindValue("minInStock", $minInStock);

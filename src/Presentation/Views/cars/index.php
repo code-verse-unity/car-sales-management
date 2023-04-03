@@ -4,33 +4,37 @@
 
 <main class="py-4">
     <div class="d-flex justify-content-between align-items-center">
-        <h1 class="display-4 fw-bold">Liste des <span class="text-orange">Voitures</span>.</h1>
+        <h1 class="fw-bold">Liste des <span class="text-orange">Voitures</span>.</h1>
         <div>
             <button class="btn btn-primary" id='add-car'>Ajouter</button>
         </div>
     </div>
 
     <!-- Search functionality, already handled by IndexCarUseCase and IndexCarController -->
-    <form action="/cars" class="container d-flex py-3 gap-3" id='search'>
-        <div class="flex-grow-1">
-            <input type="search" name="name" id="searchInput" placeholder="ex: Audi" value="<?= $nameQuery ?? "" ?>" class="form-control">
-            <div class="invalid-feedback">
-                Veuillez spécifier un paramètre de recherche.
+    <form action="/cars" class="container my-3 pt-3 pb-4 px-4 search-container rounded-3" id='search'>
+        <h5>Effectuer une recherche par nom.</h5>
+        <div class="d-flex gap-3 ">
+            <div class="flex-grow-1">
+                <input type="search" name="name" id="searchInput" placeholder="ex: Audi" value="<?= $nameQuery ?? "" ?>" class="form-control">
+                <div class="invalid-feedback">
+                    Veuillez spécifier un paramètre de recherche.
+                </div>
             </div>
+
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    Rechercher
+                </button>
+            </div>
+
+
+            <a href="/cars">
+                <button class="btn" type='button'>
+                    Effacer
+                </button>
+            </a>
         </div>
 
-        <div>
-            <button type="submit" class="btn btn-primary">
-                Rechercher
-            </button>
-        </div>
-
-
-        <a href="/cars">
-            <button class="btn" type='button'>
-                Effacer
-            </button>
-        </a>
     </form>
 
 
@@ -53,10 +57,13 @@
                     <div class="col d-flex align-items-center"> <?= $car['price'] ?></div>
                     <div class="col d-flex align-items-center"> <?= $car['inStock'] ?> </div>
                     <div class="col d-flex justify-content-end">
-                        <button class="btn btn-primary mx-3">
-                            <img src="assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
-                        </button>
-                        <button class="btn btn-danger">
+                        <a href=<?= "/cars/" . $car['id'] . '/edit' ?>>
+                            <button class="btn btn-primary mx-3" id='edit-btn'>
+                                <img src="assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
+                            </button>
+                        </a>
+
+                        <button class="btn btn-danger" id='delete-btn'>
                             <img src="assets/icons/delete.svg" alt="delete cars" srcset="" class="icon">
                         </button>
                     </div>
@@ -70,8 +77,8 @@
 
 
 <script>
-    const addClientButton = document.getElementById('add-car');
-    addClientButton.addEventListener('click', () => {
+    const addCarButton = document.getElementById('add-car');
+    addCarButton.addEventListener('click', () => {
         window.location.href = '/cars/add';
     });
 
