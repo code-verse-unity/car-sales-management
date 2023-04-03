@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
+use App\Presentation\Controllers\Clients\ShowClientController;
 use Dotenv\Dotenv;
 use App\Core\Applications\Application;
 use App\Data\Repositories\CarRepository;
@@ -83,6 +84,7 @@ $updateClientController = new UpdateClientController($updateClientUseCase);
 $createClientController = new CreateClientController();
 // ShowClientUseCase and ShowClientController
 $showClientUseCase = new ShowClientUseCase($clientRepository, $orderRepository);
+$showClientController = new ShowClientController($showClientUseCase);
 $editClientController = new EditClientController($showClientUseCase);
 
 // Car
@@ -153,6 +155,8 @@ $app->router->get("/clients/{clientId}/edit", [$editClientController, 'execute']
 $app->router->post("/clients/{clientId}/edit", [$updateClientController, "execute"]);
 // Store a new client
 $app->router->post("/clients", [$storeClientController, "execute"]);
+// Show the view of a client
+$app->router->get("/clients/{clientId}", [$showClientController, 'execute']);
 
 // Car routes
 // change POST /cars to POST /cars/create to make getting the form page and posting it to the same path, only the method differs
