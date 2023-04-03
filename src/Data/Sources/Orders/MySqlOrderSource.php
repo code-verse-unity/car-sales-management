@@ -530,13 +530,13 @@ class MySqlOrderSource implements OrderSourceInterface
             $monthsDiff = $interval->m + ($interval->y * 12) + 1;
 
             $dateAmountAssocDefault[$maxCreatedAt->format(DateTime::ATOM)] = [
-                "date" => $maxCreatedAt->format(DateTime::ATOM),
+                "date" => new DateTime($maxCreatedAt->format(DateTime::ATOM)),
                 "amount" => 0
             ];
             for ($i = 0; $i < $monthsDiff - 1; $i++) {
                 $maxCreatedAt->modify("-1 month");
                 $dateAmountAssocDefault[$maxCreatedAt->format(DateTime::ATOM)] = [
-                    "date" => $maxCreatedAt->format(DateTime::ATOM),
+                    "date" => new DateTime($maxCreatedAt->format(DateTime::ATOM)),
                     "amount" => 0
                 ];
             }
@@ -633,13 +633,13 @@ class MySqlOrderSource implements OrderSourceInterface
         $now->modify("first day of this month");
         $now->setTime(0, 0, 0, 0);
         $dateAmountAssocDefault[$now->format(DateTime::ATOM)] = [
-            "date" => $now->format(DateTime::ATOM),
+            "date" => new DateTime($now->format(DateTime::ATOM)),
             "amount" => 0
         ];
         for ($i = 0; $i < $lastMonths - 1; $i++) {
             $now->modify("-1 month");
             $dateAmountAssocDefault[$now->format(DateTime::ATOM)] = [
-                "date" => $now->format(DateTime::ATOM),
+                "date" => new DateTime($now->format(DateTime::ATOM)),
                 "amount" => 0
             ];
         }
