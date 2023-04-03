@@ -63,6 +63,10 @@ $userRepository = new UserRepository($mysqlUserSource);
 $storeUserUseCase = new StoreUserUseCase($userRepository);
 $storeUserController = new StoreUserController($storeUserUseCase);
 
+// Order Source and Repository
+$mySqlOrderSource = new MySqlOrderSource($pdo);
+$orderRepository = new OrderRepository($mySqlOrderSource);
+
 // ClientUseCase
 $mysqlClientSource = new MySqlClientSource($pdo);
 $clientRepository = new ClientRepository($mysqlClientSource);
@@ -77,8 +81,8 @@ $updateClientUseCase = new UpdateClientUseCase($clientRepository);
 $updateClientController = new UpdateClientController($updateClientUseCase);
 // Create a new client view
 $createClientController = new CreateClientController();
-
-$showClientUseCase = new ShowClientUseCase($clientRepository);
+// ShowClientUseCase and ShowClientController
+$showClientUseCase = new ShowClientUseCase($clientRepository, $orderRepository);
 $editClientController = new EditClientController($showClientUseCase);
 
 // Car
@@ -103,9 +107,6 @@ $updateCarController = new UpdateCarController($updateCarUseCase);
 $editCarController = new EditCarController($showCarUseCase);
 
 // Orders
-// Source and Repository
-$mySqlOrderSource = new MySqlOrderSource($pdo);
-$orderRepository = new OrderRepository($mySqlOrderSource);
 // StoreOrderUseCase and StoreOrderController
 $storeOrderUseCase = new StoreOrderUseCase($orderRepository, $clientRepository, $carRepository);
 $storeOrderController = new StoreOrderController($storeOrderUseCase);
