@@ -2,6 +2,7 @@
 
 require_once __DIR__ . "/../vendor/autoload.php";
 
+use App\Presentation\Controllers\Clients\ShowClientController;
 use Dotenv\Dotenv;
 use App\Core\Applications\Application;
 use App\Data\Repositories\CarRepository;
@@ -63,6 +64,10 @@ $userRepository = new UserRepository($mysqlUserSource);
 $storeUserUseCase = new StoreUserUseCase($userRepository);
 $storeUserController = new StoreUserController($storeUserUseCase);
 
+// Order Source and Repository
+$mySqlOrderSource = new MySqlOrderSource($pdo);
+$orderRepository = new OrderRepository($mySqlOrderSource);
+
 // ClientUseCase
 $mysqlClientSource = new MySqlClientSource($pdo);
 $clientRepository = new ClientRepository($mysqlClientSource);
@@ -77,8 +82,9 @@ $updateClientUseCase = new UpdateClientUseCase($clientRepository);
 $updateClientController = new UpdateClientController($updateClientUseCase);
 // Create a new client view
 $createClientController = new CreateClientController();
-
-$showClientUseCase = new ShowClientUseCase($clientRepository);
+// ShowClientUseCase and ShowClientController
+$showClientUseCase = new ShowClientUseCase($clientRepository, $orderRepository);
+$showClientController = new ShowClientController($showClientUseCase);
 $editClientController = new EditClientController($showClientUseCase);
 
 // Car
@@ -103,9 +109,6 @@ $updateCarController = new UpdateCarController($updateCarUseCase);
 $editCarController = new EditCarController($showCarUseCase);
 
 // Orders
-// Source and Repository
-$mySqlOrderSource = new MySqlOrderSource($pdo);
-$orderRepository = new OrderRepository($mySqlOrderSource);
 // StoreOrderUseCase and StoreOrderController
 $storeOrderUseCase = new StoreOrderUseCase($orderRepository, $clientRepository, $carRepository);
 $storeOrderController = new StoreOrderController($storeOrderUseCase);
@@ -152,6 +155,8 @@ $app->router->get("/clients/{clientId}/edit", [$editClientController, 'execute']
 $app->router->post("/clients/{clientId}/edit", [$updateClientController, "execute"]);
 // Store a new client
 $app->router->post("/clients", [$storeClientController, "execute"]);
+// Show the view of a client
+$app->router->get("/clients/{clientId}", [$showClientController, 'execute']);
 
 // Car routes
 // change POST /cars to POST /cars/create to make getting the form page and posting it to the same path, only the method differs

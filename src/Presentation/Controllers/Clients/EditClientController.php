@@ -33,7 +33,7 @@ class EditClientController
         $response->renderView("_500", ["fatalError" => $useCaseResult->getRaw()]);
       }
     } else {
-      $response->renderView("clients/edit", ["client" => $useCaseResult]);
+      $response->renderView("clients/edit", ["client" => $useCaseResult["client"]]);
     }
   }
 }
