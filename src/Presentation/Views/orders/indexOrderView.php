@@ -171,9 +171,12 @@
                         <?php endforeach; ?>
                     </div>
                     <div class="col d-flex justify-content-end align-self-start">
-                        <button class="btn btn-primary mx-3">
-                            <img src="/assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
-                        </button>
+                        <a href="<?= "/orders/" . $order['id'] . "/edit" ?>">
+                            <button class="btn btn-primary mx-3">
+                                <img src="/assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
+                            </button>
+                        </a>
+
                         <button class="btn btn-danger">
                             <img src="/assets/icons/delete.svg" alt="delete cars" srcset="" class="icon">
                         </button>
