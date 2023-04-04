@@ -353,38 +353,37 @@ class MySqlOrderSource implements OrderSourceInterface
         return array_values(
             array_map(
                 function ($orderArr) {
-                    return (
-                        new OrderModel(
-                            $orderArr["id"],
-                            new ClientModel(
-                                $orderArr["client"]["id"],
-                                $orderArr["client"]["name"],
-                                $orderArr["client"]["contact"],
-                                $orderArr["client"]["createdAt"],
-                                $orderArr["client"]["updatedAt"]
-                            ),
-                            array_map(
-                                function ($carIdArr) {
-                                            $car = $carIdArr["car"];
-                                            $quantity = $carIdArr["quantity"];
+                    return (new OrderModel(
+                        $orderArr["id"],
+                        new ClientModel(
+                            $orderArr["client"]["id"],
+                            $orderArr["client"]["name"],
+                            $orderArr["client"]["contact"],
+                            $orderArr["client"]["createdAt"],
+                            $orderArr["client"]["updatedAt"]
+                        ),
+                        array_map(
+                            function ($carIdArr) {
+                                $car = $carIdArr["car"];
+                                $quantity = $carIdArr["quantity"];
 
-                                            return [
-                                                "car" => new CarModel(
-                                                    $car["id"],
-                                                    $car["name"],
-                                                    $car["price"],
-                                                    $car["inStock"],
-                                                    $car["createdAt"],
-                                                    $car["updatedAt"],
-                                                ),
-                                                "quantity" => $quantity
-                                            ];
-                                        },
-                                array_values($orderArr["cars"])
-                            ),
-                            $orderArr["createdAt"],
-                            $orderArr["updatedAt"]
-                        )
+                                return [
+                                    "car" => new CarModel(
+                                        $car["id"],
+                                        $car["name"],
+                                        $car["price"],
+                                        $car["inStock"],
+                                        $car["createdAt"],
+                                        $car["updatedAt"],
+                                    ),
+                                    "quantity" => $quantity
+                                ];
+                            },
+                            array_values($orderArr["cars"])
+                        ),
+                        $orderArr["createdAt"],
+                        $orderArr["updatedAt"]
+                    )
                     );
                 },
                 $orderIdArr
@@ -497,5 +496,188 @@ class MySqlOrderSource implements OrderSourceInterface
             },
             0
         );
+    }
+
+    public function getRevenuePerMonth(): array
+    {
+        $orderTableName = OrderModel::TABLE_NAME;
+        $carTableName = CarModel::TABLE_NAME;
+        $orderCarsTableName = "order_cars";
+
+        $statement = $this->pdo->prepare(
+            "SELECT
+                MAX(createdAt) AS maxCreatedAt,
+                MIN(createdAt) AS minCreatedAt
+            FROM $orderTableName;"
+        );
+        $statement->execute();
+        $arrayFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+        $dateAmountAssocDefault = [];
+
+        // if there is one or more order
+        if (!empty($arrayFetched)) {
+
+            $minMaxCreatedAt = $arrayFetched[0];
+            $minCreatedAt = new DateTime($minMaxCreatedAt["minCreatedAt"]);
+            $minCreatedAt->modify("first day of this month");
+            $minCreatedAt->setTime(0, 0, 0, 0);
+            $maxCreatedAt = new DateTime($minMaxCreatedAt["maxCreatedAt"]);
+            $maxCreatedAt->modify("first day of this month");
+            $maxCreatedAt->setTime(0, 0, 0, 0);
+
+            $interval = $minCreatedAt->diff($maxCreatedAt);
+            $monthsDiff = $interval->m + ($interval->y * 12) + 1;
+
+            $dateAmountAssocDefault[$maxCreatedAt->format(DateTime::ATOM)] = [
+                "date" => new DateTime($maxCreatedAt->format(DateTime::ATOM)),
+                "amount" => 0
+            ];
+            for ($i = 0; $i < $monthsDiff - 1; $i++) {
+                $maxCreatedAt->modify("-1 month");
+                $dateAmountAssocDefault[$maxCreatedAt->format(DateTime::ATOM)] = [
+                    "date" => new DateTime($maxCreatedAt->format(DateTime::ATOM)),
+                    "amount" => 0
+                ];
+            }
+
+            $statement = $this->pdo->prepare(
+                "SELECT
+                    $carTableName.price,
+                    $orderCarsTableName.quantity,
+                    $orderTableName.createdAt
+                FROM $orderTableName
+                INNER JOIN $orderCarsTableName
+                    ON $orderTableName.id = $orderCarsTableName.orderId
+                INNER JOIN $carTableName
+                    ON $orderCarsTableName.carId = $carTableName.id
+                ;"
+            );
+
+            $statement->execute();
+
+            $arrayFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+            $dateAmountAssocFetched = $this->createDateAmountFromArrayFetched($arrayFetched);
+
+            // we merge them
+            foreach ($dateAmountAssocFetched as $key => $value) {
+                if (array_key_exists($key, $dateAmountAssocDefault)) {
+                    $dateAmountAssocDefault[$key]["amount"] = $value["amount"];
+                }
+            }
+        }
+
+        $dateAmountValue = array_values($dateAmountAssocDefault);
+
+        return $dateAmountValue;
+    }
+
+    public function getRevenuePerMonthByLastMonths(int $lastMonths): array
+    {
+        $orderTableName = OrderModel::TABLE_NAME;
+        $carTableName = CarModel::TABLE_NAME;
+        $orderCarsTableName = "order_cars";
+
+        $whereQuery = "";
+
+        if ($lastMonths > 1) {
+            $whereQuery = "WHERE
+            $orderTableName.createdAt BETWEEN DATE_ADD(
+                DATE_SUB(
+                    CURDATE(),
+                    INTERVAL :lastMonths MONTH
+                ),
+                INTERVAL - DAY(
+                    DATE_SUB(
+                        CURDATE(),
+                        INTERVAL :lastMonths MONTH
+                    )
+                ) + 1 DAY
+            )
+            AND LAST_DAY(NOW())";
+        } else {
+            $whereQuery = "WHERE
+                MONTH($orderTableName.createdAt) = MONTH(CURDATE())
+            AND 
+                YEAR($orderTableName.createdAt) = YEAR(CURDATE())";
+        }
+
+        $statement = $this->pdo->prepare(
+            "SELECT
+                $carTableName.price,
+                $orderCarsTableName.quantity,
+                $orderTableName.createdAt
+            FROM $orderTableName
+            INNER JOIN $orderCarsTableName
+                ON $orderTableName.id = $orderCarsTableName.orderId
+            INNER JOIN $carTableName
+                ON $orderCarsTableName.carId = $carTableName.id
+            $whereQuery
+            ;"
+        );
+
+        if ($lastMonths > 1) {
+            $statement->bindValue("lastMonths", $lastMonths);
+        }
+
+        $statement->execute();
+
+        // we fetch from the db
+        $arrayFetched = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $dateAmountAssocFetched = $this->createDateAmountFromArrayFetched($arrayFetched);
+
+        // we create the default result
+        $dateAmountAssocDefault = [];
+        $now = new DateTime();
+        $now->modify("first day of this month");
+        $now->setTime(0, 0, 0, 0);
+        $dateAmountAssocDefault[$now->format(DateTime::ATOM)] = [
+            "date" => new DateTime($now->format(DateTime::ATOM)),
+            "amount" => 0
+        ];
+        for ($i = 0; $i < $lastMonths - 1; $i++) {
+            $now->modify("-1 month");
+            $dateAmountAssocDefault[$now->format(DateTime::ATOM)] = [
+                "date" => new DateTime($now->format(DateTime::ATOM)),
+                "amount" => 0
+            ];
+        }
+
+        // we merge them
+        foreach ($dateAmountAssocFetched as $key => $value) {
+            if (array_key_exists($key, $dateAmountAssocDefault)) {
+                $dateAmountAssocDefault[$key]["amount"] = $value["amount"];
+            }
+        }
+
+        $dateAmountValue = array_values($dateAmountAssocDefault);
+
+        return $dateAmountValue;
+    }
+
+    /* It creates an associative array with date and amount as keys*/
+    private function createDateAmountFromArrayFetched($arrayFetched)
+    {
+
+        $dateAmountAssocFetched = [];
+
+        foreach ($arrayFetched as $fetched) {
+            $firstDate = new DateTime($fetched["createdAt"]);
+            $firstDate->modify("first day of this month");
+            $firstDate->setTime(0, 0, 0, 0);
+            $dateString = $firstDate->format(DateTime::ATOM);
+
+            if (array_key_exists($dateString, $dateAmountAssocFetched)) {
+                $dateAmountAssocFetched[$dateString]["amount"] += $fetched["price"] * $fetched["quantity"];
+            } else {
+                $dateAmountAssocFetched[$dateString] = [
+                    "amount" => $fetched["price"] * $fetched["quantity"],
+                    "date" => $firstDate
+                ];
+            }
+        }
+
+        return $dateAmountAssocFetched;
     }
 }
