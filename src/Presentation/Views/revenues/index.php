@@ -15,7 +15,11 @@ use App\Core\Utils\Strings\FormatCurrency;
             <?php foreach ($revenuePerMonthForLast6Months as $dateAmount) : ?>
                 <div class="bg-white p-3 mb-3 rounded-3 shadow">
                     <h6><?= $dateAmount["date"]->format("F Y") ?></h6>
-                    <p class="fw-bold fs-4 text-orange"><?= FormatCurrency::format($dateAmount["amount"]) ?></p>
+                    <?php if ($dateAmount["amount"] === 0) : ?>
+                        <p class="text-secondary">Aucune vente effectué</p>
+                    <?php else : ?>
+                        <p class="fw-bold fs-4 text-orange"><?= FormatCurrency::format($dateAmount["amount"]) ?></p>
+                    <?php endif ?>
                 </div>
             <?php endforeach; ?>
 
