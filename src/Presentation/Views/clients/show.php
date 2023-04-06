@@ -2,12 +2,6 @@
 
 ?>
 
-<!-- <pre>
-    <?php print_r($client); ?>
-    <hr>
-    <?php print_r($orders); ?>
-</pre> -->
-
 <main class="container py-5">
     <div class="row">
         <div class="col">
@@ -42,15 +36,15 @@
             <div class="d-flex flex-column gap-2">
                 <h3 class=""><span class="text-orange">Achats</span> effectués</h3>
 
-                <div class="row mb-2 d-flex justify-content-between">
-                    <div class="col-7">Désignation de la voiture</div>
-                    <div class="col">Quantité</div>
-                </div>
+
 
                 <?php if (empty($orders)) : ?>
                     <div>Aucun achat effectué.</div>
                 <?php else : ?>
-
+                    <div class="row mb-2 d-flex justify-content-between">
+                        <div class="col-7">Désignation de la voiture</div>
+                        <div class="col">Quantité</div>
+                    </div>
                     <?php foreach ($orders as $order) : ?>
                         <a href="<?= "/orders/" . $order['id'] ?>" class="bg-white rounded-3 p-3 mx-1 mb-2 text-decoration-none text-body">
                             <div class="row d-flex justify-content-between">
