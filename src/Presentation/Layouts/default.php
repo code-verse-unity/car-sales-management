@@ -36,6 +36,7 @@ function activeLink(string $link)
                 <li class="nav-item"><a href="/clients" <?= activeLink("Clients") ?>>Clients</a></li>
                 <li class="nav-item"><a href="/cars" <?= activeLink("Cars") ?>>Voitures</a></li>
                 <li class="nav-item"><a href="/orders" <?= activeLink("Orders") ?>>Achats</a></li>
+                <li class="nav-item"><a href="/revenues" <?= activeLink("Revenues") ?>>Recettes</a></li>
             </ul>
         </div>
     </nav>
