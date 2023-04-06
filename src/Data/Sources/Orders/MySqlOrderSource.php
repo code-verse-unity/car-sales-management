@@ -410,16 +410,40 @@ class MySqlOrderSource implements OrderSourceInterface
     {
         $orderTableName = OrderModel::TABLE_NAME;
 
+        $whereQuery = "";
+
+        if ($lastMonths > 1) {
+            $whereQuery = "WHERE
+            $orderTableName.createdAt BETWEEN DATE_ADD(
+                DATE_SUB(
+                    CURDATE(),
+                    INTERVAL :lastMonths MONTH
+                ),
+                INTERVAL - DAY(
+                    DATE_SUB(
+                        CURDATE(),
+                        INTERVAL :lastMonths MONTH
+                    )
+                ) + 1 DAY
+            )
+            AND LAST_DAY(NOW())";
+        } else {
+            $whereQuery = "WHERE
+                MONTH($orderTableName.createdAt) = MONTH(CURDATE())
+            AND
+                YEAR($orderTableName.createdAt) = YEAR(CURDATE())";
+        }
+
         $statement = $this->pdo->prepare(
             "SELECT
                 COUNT(*) AS ordersCount
             FROM $orderTableName
-            WHERE
-                createdAt >= DATE_SUB(
-                    CURDATE(),
-                    INTERVAL :lastMonths MONTH
-                );"
+            $whereQuery;"
         );
+
+        if ($lastMonths > 1) {
+            $statement->bindValue("lastMonths", $lastMonths);
+        }
 
         $statement->bindValue("lastMonths", $lastMonths);
 
@@ -467,6 +491,30 @@ class MySqlOrderSource implements OrderSourceInterface
         $carTableName = CarModel::TABLE_NAME;
         $orderCarsTableName = "order_cars";
 
+        $whereQuery = "";
+
+        if ($lastMonths > 1) {
+            $whereQuery = "WHERE
+            $orderTableName.createdAt BETWEEN DATE_ADD(
+                DATE_SUB(
+                    CURDATE(),
+                    INTERVAL :lastMonths MONTH
+                ),
+                INTERVAL - DAY(
+                    DATE_SUB(
+                        CURDATE(),
+                        INTERVAL :lastMonths MONTH
+                    )
+                ) + 1 DAY
+            )
+            AND LAST_DAY(NOW())";
+        } else {
+            $whereQuery = "WHERE
+                MONTH($orderTableName.createdAt) = MONTH(CURDATE())
+            AND 
+                YEAR($orderTableName.createdAt) = YEAR(CURDATE())";
+        }
+
         $statement = $this->pdo->prepare(
             "SELECT
                 $carTableName.price,
@@ -476,12 +524,12 @@ class MySqlOrderSource implements OrderSourceInterface
                 ON $orderTableName.id = $orderCarsTableName.orderId
             INNER JOIN $carTableName
                 ON $orderCarsTableName.carId = $carTableName.id
-            WHERE
-                $orderTableName.createdAt >= DATE_SUB(
-                    CURDATE(),
-                    INTERVAL :lastMonths MONTH
-                );"
+            $whereQuery;"
         );
+
+        if ($lastMonths > 1) {
+            $statement->bindValue("lastMonths", $lastMonths);
+        }
 
         $statement->bindValue("lastMonths", $lastMonths);
 
