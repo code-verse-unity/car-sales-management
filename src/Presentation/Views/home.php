@@ -1,4 +1,5 @@
 <?php
+
 use App\Core\Utils\Strings\FormatCurrency;
 
 ?>
@@ -10,8 +11,8 @@ use App\Core\Utils\Strings\FormatCurrency;
     </div>
     <div class="col">
       <div class='ca-image d-flex flex-column justify-content-center p-4 text-light'>
-        <h4>Chiffre d'affaire </h4>
-        <div class="fw-bold display-4">152 000 000 Ar</div>
+        <h4>Chiffre d'affaire des 6 derniers mois </h4>
+        <div class="fw-bold display-5"><?= FormatCurrency::format($revenueOfLast6Months) ?></div>
       </div>
     </div>
   </div>
@@ -19,39 +20,33 @@ use App\Core\Utils\Strings\FormatCurrency;
   <div class="row py-4">
     <div class="col">
       <div class='clients-image d-flex flex-column justify-content-center p-4 text-light'>
-        <h4>Liste des Clients </h4>
-        <div class="fw-bold display-4">15</div>
+        <h4>Nombre de Clients </h4>
+        <div class="fw-bold display-4"><?= $clientsCount ?></div>
       </div>
     </div>
+
+    <div class="col">
+      <div class='cars-image d-flex flex-column justify-content-center p-4 text-light'>
+        <h4>Nombre de voitures </h4>
+        <div class="fw-bold display-4"><?= $carsCount ?></div>
+      </div>
+    </div>
+
     <div class="col">
       <div class='orders-image d-flex flex-column justify-content-center p-4 text-light'>
         <h4>Liste des achats </h4>
-        <div class="fw-bold display-4">120</div>
-      </div>
-    </div>
-    <div class="col">
-      <div class='cars-image d-flex flex-column justify-content-center p-4 text-light'>
-        <h4>Liste des voitures </h4>
-        <div class="fw-bold display-4">120</div>
+        <div class="fw-bold display-4"><?= $ordersCount ?></div>
       </div>
     </div>
   </div>
-
-  <pre>
-    <?php var_dump($clientsCount); ?>
-    <?php var_dump($carsCount); ?>
-    <?php var_dump($ordersCount); ?>
-    <?php var_dump($ordersCountForLast6Months); ?>
-    <?php var_dump(FormatCurrency::format($revenue)); ?>
-    <?php var_dump(FormatCurrency::format($revenueOfLast6Months)); ?>
-  </pre>
 </main>
 
-<!-- Js script to handle navigation to /clients /cars and /orders -->
+<!-- Js script to handle navigation to /clients /cars, /orders and /revenues -->
 <script>
   const clients = document.querySelector('.clients-image');
   const cars = document.querySelector('.cars-image');
   const orders = document.querySelector('.orders-image');
+  const revenues = document.querySelector('.ca-image');
 
   clients.addEventListener('click', () => {
     window.location.href = '/clients';
@@ -63,5 +58,9 @@ use App\Core\Utils\Strings\FormatCurrency;
 
   orders.addEventListener('click', () => {
     window.location.href = '/orders';
+  });
+
+  revenues.addEventListener('click', () => {
+    window.location.href = '/revenues';
   });
 </script>

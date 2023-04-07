@@ -28,14 +28,19 @@
           <div class="col d-flex align-items-center"><?= $client['contact'] ?></div>
           <div class="col d-flex justify-content-end">
             <a href="<?= "/clients/" . $client['id'] . "/edit" ?>">
-              <button class="btn btn-primary mx-3">
-                <img src="assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
+              <button class="btn btn-primary ">
+                <img src="assets/icons/edit.svg" alt="edit client" srcset="" class="icon">
               </button>
             </a>
-
-            <button class="btn btn-danger">
-              <img src="assets/icons/delete.svg" alt="delete cars" srcset="" class="icon">
-            </button>
+            <a href="<?= "/clients/" . $client['id'] ?>">
+              <button class="btn btn-success mx-3">
+                <img src="assets/icons/show.svg" alt="show client" srcset="" class="icon">
+              </button>
+            </a>
+            <!-- TODO need review -->
+            <!-- <button class="btn btn-danger">
+              <img src="assets/icons/delete.svg" alt="delete client" srcset="" class="icon">
+            </button> -->
           </div>
         </div>
       <?php endforeach; ?>
