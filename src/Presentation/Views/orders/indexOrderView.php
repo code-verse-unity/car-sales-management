@@ -181,9 +181,34 @@
                                 <img src="/assets/icons/show.svg" alt="edit cars" srcset="" class="icon">
                             </button>
                         </a>
-                        <button class="btn btn-danger">
-                            <img src="/assets/icons/delete.svg" alt="delete cars" srcset="" class="icon">
-                        </button>
+
+                        <form action="/orders/<?= $order["id"] ?>/delete" method="POST" class="mb-3">
+
+                            <!-- Button trigger modal -->
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                                <img src="/assets/icons/delete.svg" alt="delete cars" srcset="" class="icon">
+                            </button>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Annulation d'achat ?</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Vous êtes sur le point d'annuler cet achat. Cette action est irréversible.</p>
+                                            <p>Si vous êtes sur de vouloir annuler cet achat, cliquez sur le bouton "Oui, annuler".</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non</button>
+                                            <input type="submit" value="Oui, annuler" class="btn btn-danger">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
                 <div class="d-flex justify-content-end ">
