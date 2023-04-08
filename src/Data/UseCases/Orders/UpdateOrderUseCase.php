@@ -96,12 +96,6 @@ class UpdateOrderUseCase
             $oldOrder->setCarsQuantities($carsQuantities);
             $newCarsQuantities = $oldOrder->getCarsQuantities();
 
-            // echo "<pre>";
-            // var_dump($excludedCars);
-            // var_dump($newCarsQuantities);
-            // echo "</pre>";
-            // exit;
-
             if (!$oldOrder->hasErrors()) {
                 $randomStringGenerator = new RandomString(OrderModel::ID_CHARACTERS);
 
@@ -217,7 +211,6 @@ class UpdateOrderUseCase
                 "order" => $orderRaw
             ];
         } catch (\Throwable $th) {
-            var_dump($th);
             exit;
             if ($th instanceof Failure) {
                 return $th;

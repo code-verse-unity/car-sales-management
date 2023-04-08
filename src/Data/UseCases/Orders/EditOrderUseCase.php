@@ -95,7 +95,6 @@ class EditOrderUseCase
                 "cars" => $carsRaw,
             ];
         } catch (\Throwable $th) {
-            var_dump($th);
             if ($th instanceof Failure) {
                 return $th;
             } else {
