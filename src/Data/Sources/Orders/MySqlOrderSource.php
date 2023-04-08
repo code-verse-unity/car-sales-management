@@ -249,7 +249,48 @@ class MySqlOrderSource implements OrderSourceInterface
         string $createdAt,
         string $updatedAt
     ): void {
-        throw new ServerFailure("Not implemented yet.");
+        $orderTableName = OrderModel::TABLE_NAME;
+        $orderCarsTableName = "order_cars";
+
+        // update the order
+        $statement = $this->pdo->prepare(
+            "UPDATE $orderTableName
+            SET
+                clientId = :clientId,
+                createdAt = :createdAt,
+                updatedAt = :updatedAt
+            WHERE id = :id;"
+        );
+        $statement->bindValue("id", $id);
+        $statement->bindValue("clientId", $clientId);
+        $statement->bindValue("createdAt", $createdAt);
+        $statement->bindValue("updatedAt", $updatedAt);
+        $statement->execute();
+
+        // delete orderCars
+        $statement = $this->pdo->prepare(
+            "DELETE FROM $orderCarsTableName WHERE orderId = :orderId;"
+        );
+        $statement->bindValue("orderId", $id);
+        $statement->execute();
+
+        // create the new orderCars
+        $length = count($orderCarsIds);
+        for ($i = 0; $i < $length; $i++) {
+            $statement = $this->pdo->prepare(
+                "INSERT INTO $orderCarsTableName
+                    (id, orderId, carId, quantity, createdAt, updatedAt)
+                VALUES
+                    (:id, :orderId, :carId, :quantity, :createdAt, :updatedAt);"
+            );
+            $statement->bindValue("id", $orderCarsIds[$i]);
+            $statement->bindValue("orderId", $id);
+            $statement->bindValue("carId", $carsIds[$i]);
+            $statement->bindValue("quantity", $quantities[$i]);
+            $statement->bindValue("createdAt", $updatedAt); // the creation is the same as the order's updatedAt
+            $statement->bindValue("updatedAt", $updatedAt);
+            $statement->execute();
+        }
     }
 
     /*
