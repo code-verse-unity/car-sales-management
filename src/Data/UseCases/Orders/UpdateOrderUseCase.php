@@ -5,7 +5,7 @@ namespace App\Data\UseCases\Orders;
 use App\Core\Utils\Failures\ServerFailure;
 use App\Core\Utils\Strings\RandomString;
 use App\Data\Models\OrderModel;
-use App\Data\UseCases\Bills\StoreBillUseCase;
+use App\Data\UseCases\Bills\UpdateBillUseCase;
 use App\Domain\Repositories\OrderRepositoryInterface;
 use App\Core\Utils\Failures\Failure;
 use App\Domain\Repositories\CarRepositoryInterface;
@@ -150,12 +150,11 @@ class UpdateOrderUseCase
                     );
                 }
 
-                // TODO Update the bill
-                // $storeBillUseCase = new StoreBillUseCase($oldOrder);
-                // $useCaseResult = $storeBillUseCase->execute();
-                // if ($useCaseResult instanceof Failure) {
-                //     return $useCaseResult;
-                // }
+                $updateBillUseCase = new UpdateBillUseCase($oldOrder);
+                $useCaseResult = $updateBillUseCase->execute();
+                if ($useCaseResult instanceof Failure) {
+                    return $useCaseResult;
+                }
             }
 
             $clients = $this->clientRepository->findAll();
