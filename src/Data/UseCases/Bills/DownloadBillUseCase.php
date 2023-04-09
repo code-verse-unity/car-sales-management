@@ -31,7 +31,7 @@ class DownloadBillUseCase
             } else {
                 header("Content-Type: application/pdf");
                 header("Content-Disposition: attachement; filename=\"" . $filename . "\"");
-                require_once $path;
+                readfile($path);
                 exit;
             }
 

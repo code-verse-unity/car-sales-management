@@ -26,6 +26,8 @@ use App\Data\UseCases\Orders\StoreOrderUseCase;
 use App\Data\UseCases\Orders\IndexOrderUseCase;
 use App\Data\UseCases\Orders\ShowOrderUseCase;
 use App\Data\UseCases\Orders\DestroyOrderUseCase;
+use App\Data\UseCases\Orders\EditOrderUseCase;
+use App\Data\UseCases\Orders\UpdateOrderUseCase;
 use App\Data\UseCases\Bills\DownloadBillUseCase;
 use App\Data\UseCases\Clients\ShowClientUseCase;
 use App\Data\UseCases\Home\ShowHomeUseCase;
@@ -47,6 +49,8 @@ use App\Presentation\Controllers\Orders\CreateOrderController;
 use App\Presentation\Controllers\Orders\IndexOrderController;
 use App\Presentation\Controllers\Orders\ShowOrderController;
 use App\Presentation\Controllers\Orders\DestroyOrderController;
+use App\Presentation\Controllers\Orders\EditOrderController;
+use App\Presentation\Controllers\Orders\UpdateOrderController;
 use App\Presentation\Controllers\Bills\DownloadBillController;
 use App\Presentation\Controllers\Clients\EditClientController;
 use App\Presentation\Controllers\Revenues\IndexRevenueController;
@@ -126,6 +130,12 @@ $showOrderController = new ShowOrderController($showOrderUseCase);
 // DestroyOrderUseCase and DestroyOrderController
 $destroyOrderUseCase = new DestroyOrderUseCase($orderRepository);
 $destroyOrderController = new DestroyOrderController($destroyOrderUseCase);
+// EditOrderUseCase and EditOrderController
+$editOrderUseCase = new EditOrderUseCase($clientRepository, $carRepository, $orderRepository);
+$editOrderController = new EditOrderController($editOrderUseCase);
+// UpdateOrderUseCase and UpdateOrderController
+$updateOrderUseCase = new UpdateOrderUseCase($orderRepository, $clientRepository, $carRepository);
+$updateOrderController = new UpdateOrderController($updateOrderUseCase);
 
 // Bills
 $downloadBillUseCase = new DownloadBillUseCase($orderRepository);
@@ -180,6 +190,8 @@ $app->router->get("/orders/create", [$createOrderController, "execute"]);
 $app->router->post("/orders/create", [$storeOrderController, "execute"]);
 $app->router->post("/orders/{orderId}/delete", [$destroyOrderController, "execute"]);
 $app->router->delete("/orders/{orderId}/delete", [$destroyOrderController, "execute"]);
+$app->router->get("/orders/{orderId}/edit", [$editOrderController, "execute"]);
+$app->router->post("/orders/{orderId}/edit", [$updateOrderController, "execute"]);
 $app->router->get("/orders/{orderId}", [$showOrderController, "execute"]);
 
 // Bills routes
