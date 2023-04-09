@@ -38,7 +38,7 @@ function carsToJSCars($cars)
 
 
 <main class="container d-flex flex-column justify-content-center align-items-center py-4 my-4 w-75">
-    <h1 class="display-6 fw-bold">Enregistrer un nouveau <span class="text-orange">Achat</span>.</h1>
+    <h1 class="display-6 fw-bold">Modifier cet <span class="text-orange">Achat</span>.</h1>
 
     <form action="/orders/<?= $order["id"] ?>/edit" method="post" class="d-flex flex-column gap-2 py-3 w-75" id='create-order-form' novalidate>
         <div class="mb-3">
@@ -65,7 +65,7 @@ function carsToJSCars($cars)
         </div>
         <div class="d-flex flex-column">
             <button class="btn btn-primary mt-2" type="submit">
-                Enregistrer
+                Sauvegarder la modification
             </button>
             <a href="/orders" class="btn mt-2">
                 Retour
