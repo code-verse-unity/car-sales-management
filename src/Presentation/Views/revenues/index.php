@@ -4,11 +4,13 @@ use App\Core\Utils\Strings\FormatCurrency;
 ?>
 
 <main class="my-4">
-    <h1 class="fw-bold w-50 mb-4"><span class="text-orange">Recette</span> totale accumulé des <span class="text-orange">6 derniers mois</span>.</h1>
     <div class="row">
         <div class="col-8 ">
-            <div class="bg-white p-3 rounded-3 shadow sticky-top">
-                <canvas id="myChart"></canvas>
+            <div class="sticky-top">
+                <h1 class="fw-bold mb-4"><span class="text-orange">Recette</span> totale accumulé des <span class="text-orange">6 derniers mois</span>.</h1>
+                <div class="bg-white p-3 rounded-3 shadow ">
+                    <canvas id="myChart"></canvas>
+                </div>
             </div>
         </div>
         <div class="col">
