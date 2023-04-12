@@ -77,6 +77,7 @@ function carsToJSCars($cars)
 
 <script>
     let cars = <?= carsToJSCars($cars) ?>;
+    console.log(cars);
     const initialCars = cars;
 
     const carOrdersContainer = document.getElementById("carOrdersContainer");
@@ -92,6 +93,7 @@ function carsToJSCars($cars)
 
         const carOrderContainer = document.createElement("div");
         carOrderContainer.classList.add("carOrderContainer", "row", 'gap-2');
+        carOrderContainer.setAttribute("id", `car-order-container-${carOrderCount}`)
 
         const carIdSelect = document.createElement("select");
         carIdSelect.setAttribute("name", "carsIds");
@@ -125,7 +127,7 @@ function carsToJSCars($cars)
         const quantityInput = document.createElement("input");
         quantityInput.setAttribute("type", "number");
         quantityInput.setAttribute("name", "quantities");
-        quantityInput.setAttribute("id", "quantity");
+        quantityInput.setAttribute("id", `quantity-${carOrderCount}`);
         quantityInput.setAttribute("placeholder", "quantité");
 
         // Validate the quantityInput and modify the cars array
@@ -179,15 +181,31 @@ function carsToJSCars($cars)
         const deleteCarOrderButton = document.createElement("button");
         deleteCarOrderButton.innerText = "x";
         deleteCarOrderButton.classList.add('col-1', 'btn', 'btn-danger', "mb-3")
+        deleteCarOrderButton.setAttribute("id", `delete-btn-${carOrderCount}`);
 
         deleteCarOrderButton.addEventListener("click", (event) => {
             event.preventDefault();
-
             if (carOrderCount > 1) {
-                const childToRemove = [
-                    ...carOrdersContainer.children
-                ].find((child) => child === carOrderContainer);
+                // Get the index from the delete button
+                const index = event.srcElement.id?.split("-")[2];
+
+                const childToRemove = document.getElementById(`car-order-container-${index}`);
+                const inputQuantity = document.getElementById(`quantity-${index}`);
                 carOrdersContainer.removeChild(childToRemove);
+
+                cars = cars.map((car, i) => {
+                    const carId = car.id;
+
+                    if (carId === carIdSelect.value) {
+                        return {
+                            ...car,
+                            inStock: car.inStock + inputQuantity.value
+                        }
+                    } else {
+                        return car
+                    }
+                });
+
                 carOrderCount--;
             }
         });
@@ -205,6 +223,20 @@ function carsToJSCars($cars)
         carOrderContainer.appendChild(deleteCarOrderButton);
 
         carOrdersContainer.appendChild(carOrderContainer);
+
+        if (carIdSelected && quantity) {
+            cars = cars.map(car => {
+                if (car.id === carIdSelected) {
+                    const remain = car.inStock - quantity
+                    return {
+                        ...car,
+                        inStock: remain <= 0 ? 0 : remain
+                    }
+                } else {
+                    return car
+                }
+            })
+        }
     }
 
     const addCarButton = document.getElementById("addCar");

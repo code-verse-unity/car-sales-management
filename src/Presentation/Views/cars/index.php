@@ -1,5 +1,7 @@
 <?php
 
+use App\Core\Utils\Strings\FormatCurrency;
+
 ?>
 
 <main class="py-4">
@@ -47,14 +49,14 @@
         <div class="container">
             <div class="row pt-3">
                 <div class="col">Désignation</div>
-                <div class="col">Prix (Ar)</div>
+                <div class="col">Prix d'unité</div>
                 <div class="col">Nombre en stock</div>
                 <div class="col d-flex justify-content-end">Actions</div>
             </div>
             <?php foreach ($cars as $car) : ?>
                 <div class="row my-3 py-3 px-2 bg-white rounded-3 shadow-sm">
                     <div class="col d-flex align-items-center fw-bold"> <?= $car['name'] ?> </div>
-                    <div class="col d-flex align-items-center"> <?= $car['price'] ?></div>
+                    <div class="col d-flex align-items-center text-orange"> <?= FormatCurrency::format($car['price']) ?></div>
                     <div class="col d-flex align-items-center"> <?= $car['inStock'] ?> </div>
                     <div class="col d-flex justify-content-end">
                         <a href=<?= "/cars/" . $car['id'] . '/edit' ?>>

@@ -12,6 +12,17 @@ function activeLink(string $link)
         return  "class='nav-link text-secondary'";
     }
 }
+
+$title = [
+    "" => "Accueil",
+    "/clients" => "Gestion des clients",
+    "/cars" => "Gestion des voitures",
+    "/orders" => "Gestion des achats",
+    "/revenues" => "Gestion des recettes",
+    "/clients/add" => "Nouveau client",
+    "/cars/add" => "Nouvelle voiture",
+    "/orders/create" => "Nouvelle vente",
+];
 ?>
 
 <!DOCTYPE html>
@@ -24,8 +35,10 @@ function activeLink(string $link)
     <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="/styles.css">
 
-    <title>Document</title>
+    <title> <?= $title[$_SERVER['PATH_INFO']] ?> </title>
+
 </head>
+
 
 <body class="bg-light container">
     <nav class="row py-3">
