@@ -64,10 +64,6 @@ use App\Core\Utils\Strings\FormatCurrency;
                                 <img src="assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
                             </button>
                         </a>
-
-                        <button class="btn btn-danger" id='delete-btn'>
-                            <img src="assets/icons/delete.svg" alt="delete cars" srcset="" class="icon">
-                        </button>
                     </div>
                 </div>
             <?php endforeach; ?>
