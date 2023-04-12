@@ -11,8 +11,9 @@ class DateFormatter
         DateTime $date,
         $format = "dd MMMM yyyy",
         $locale = "fr_FR",
-        $currentTimeZone = $_ENV["CURRENT_TIMEZONE_NAME"]
     ) {
+        $currentTimeZone = $_ENV["CURRENT_TIMEZONE_NAME"];
+
         $formatter = new IntlDateFormatter(
             $locale,
             IntlDateFormatter::FULL,
