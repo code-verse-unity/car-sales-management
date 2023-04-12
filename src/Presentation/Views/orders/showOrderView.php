@@ -7,45 +7,7 @@ use App\Core\Utils\Strings\FormatCurrency;
     <div class="row my-3">
         <div class="col-9">
             <h1>Détails de la <span class="text-orange">facture</span> </h1>
-            <div class="bg-white rounded-3 p-4 shadow">
-                <ol class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">Réference de la facture </div>
-                            <?= $order["id"] ?>
-                        </div>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">Information du client</div>
-                            <ul>
-                                <li class="list-item"> Nom et prénoms : <?= $order["client"]["name"] ?></li>
-                                <li class="list-item">Téléphone : <?= $order["client"]["contact"] ?></li>
-                            </ul>
-                        </div>
-
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">Détails de(s) voiture(s)</div>
-                            <ul>
-                                <li class="list-item"> Nombre de voitures : <?= count($order["carsIds"]) ?></li>
-                                <?php foreach ($order["carsQuantities"] as $carQuantity) : ?>
-                                    <li class="list-item"> <?= $carQuantity['car']['name'] ?> ( <?= $carQuantity['quantity'] ?> ) : <?= FormatCurrency::format($carQuantity['subtotal']) ?> </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                            <div class="fw-bold">Somme Totale reçue</div>
-                            <?= FormatCurrency::format($order["total"]) ?>
-                        </div>
-                    </li>
-                </ol>
-            </div>
-
+            <?php require_once __DIR__ . "/../_bill.php" ?>
         </div>
         <div class="col">
             <h1>Actions</h1>
