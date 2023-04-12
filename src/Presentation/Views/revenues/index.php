@@ -1,6 +1,7 @@
 <?php
 
 use App\Core\Utils\Strings\FormatCurrency;
+use App\Core\Utils\Strings\DateFormatter;
 ?>
 
 <main class="my-4">
@@ -16,7 +17,7 @@ use App\Core\Utils\Strings\FormatCurrency;
         <div class="col">
             <?php foreach ($revenuePerMonthForLast6Months as $dateAmount) : ?>
                 <div class="bg-white p-3 mb-3 rounded-3 shadow">
-                    <h6><?= $dateAmount["date"]->format("F Y") ?></h6>
+                    <h6><?= DateFormatter::format($dateAmount["date"], "MMMM yyyy") ?></h6>
                     <?php if ($dateAmount["amount"] === 0) : ?>
                         <p class="text-secondary">Aucune vente effectuée</p>
                     <?php else : ?>
@@ -24,7 +25,6 @@ use App\Core\Utils\Strings\FormatCurrency;
                     <?php endif ?>
                 </div>
             <?php endforeach; ?>
-
         </div>
     </div>
 

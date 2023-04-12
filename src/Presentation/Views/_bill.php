@@ -6,6 +6,7 @@
 require_once __DIR__ . "/../../../vendor/autoload.php";
 
 use App\Data\Models\OrderModel;
+use App\Core\Utils\Strings\DateFormatter;
 
 function formatCurrency($amount)
 {
@@ -137,7 +138,7 @@ function numberToText($number)
 
         <div>
             <h2>Date de facturation :
-                <?= formatDate($order["createdAt"]) ?>
+                <?= DateFormatter::format($order["createdAt"]) ?>
             </h2>
 
             <h2>Nom du client :
