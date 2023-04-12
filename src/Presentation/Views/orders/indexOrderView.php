@@ -1,8 +1,7 @@
 <?php
 
+use App\Core\Utils\Strings\DateFormatter;
 ?>
-
-
 
 <main class="py-4">
     <div class="d-flex justify-content-between align-items-center">
@@ -56,6 +55,7 @@
                 <div class="col">Nom du client</div>
                 <div class="col">Voitures</div>
                 <div class="col">Quantité</div>
+                <div class="col">Date</div>
                 <div class="col d-flex justify-content-end">Actions</div>
             </div>
             <?php foreach ($orders as $order) : ?>
@@ -71,6 +71,9 @@
                         <?php foreach ($order['quantities'] as $quantity) : ?>
                             <div class="mb-2"> <?= $quantity ?></div>
                         <?php endforeach; ?>
+                    </div>
+                    <div class="col pt-2">
+                        <?= DateFormatter::format($order["createdAt"]) ?>
                     </div>
                     <div class="col d-flex justify-content-end align-self-start">
                         <a href="<?= "/orders/" . $order['id'] . "/edit" ?>">
