@@ -11,7 +11,7 @@ use App\Core\Utils\Strings\FormatCurrency;
     </div>
     <div class="col">
       <div class='ca-image d-flex flex-column justify-content-center p-4 text-light'>
-        <h4>Chiffre d'affaire des 6 derniers mois </h4>
+        <h4>Chiffre d'affaires des 6 derniers mois </h4>
         <div class="fw-bold display-5"><?= FormatCurrency::format($revenueOfLast6Months) ?></div>
       </div>
     </div>
@@ -20,7 +20,7 @@ use App\Core\Utils\Strings\FormatCurrency;
   <div class="row py-4">
     <div class="col">
       <div class='clients-image d-flex flex-column justify-content-center p-4 text-light'>
-        <h4>Nombre de Clients </h4>
+        <h4>Nombre de clients </h4>
         <div class="fw-bold display-4"><?= $clientsCount ?></div>
       </div>
     </div>
