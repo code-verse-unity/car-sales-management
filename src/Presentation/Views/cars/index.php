@@ -60,7 +60,7 @@ use App\Core\Utils\Strings\FormatCurrency;
                     <div class="col d-flex align-items-center"> <?= $car['inStock'] ?> </div>
                     <div class="col d-flex justify-content-end">
                         <a href=<?= "/cars/" . $car['id'] . '/edit' ?>>
-                            <button class="btn btn-primary mx-3" id='edit-btn'>
+                            <button class="btn btn-primary ml-3" id='edit-btn'>
                                 <img src="assets/icons/edit.svg" alt="edit cars" srcset="" class="icon">
                             </button>
                         </a>
