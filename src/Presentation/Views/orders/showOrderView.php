@@ -11,6 +11,12 @@ use App\Core\Utils\Strings\FormatCurrency;
         </div>
         <div class="col">
             <h1>Actions</h1>
+            <a href="<?= "/orders/" . $order['id'] . "/edit" ?>" class="btn btn-primary mb-3">
+                Modifier cet achat
+            </a>
+
+            <a href="/bills/<?= $order["id"] ?>/download" class="btn btn-success mb-3">Télécharger la facture</a>
+
             <form action="/orders/<?= $order["id"] ?>/delete" method="POST" class="mb-3">
 
                 <!-- Button trigger modal -->
@@ -38,8 +44,6 @@ use App\Core\Utils\Strings\FormatCurrency;
                     </div>
                 </div>
             </form>
-
-            <a href="/bills/<?= $order["id"] ?>/download" class="btn btn-primary">Télécharger la facture</a>
         </div>
     </div>
 </main>
