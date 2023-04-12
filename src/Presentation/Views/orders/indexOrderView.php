@@ -6,7 +6,7 @@
 
 <main class="py-4">
     <div class="d-flex justify-content-between align-items-center">
-        <h1 class="fw-bold">Liste des <span class="text-orange">Achats</span> effectuées.</h1>
+        <h1 class="fw-bold">Liste des <span class="text-orange">Achats</span> effectués.</h1>
         <div>
             <button class="btn btn-primary" id='add-order'>Ajouter</button>
         </div>
