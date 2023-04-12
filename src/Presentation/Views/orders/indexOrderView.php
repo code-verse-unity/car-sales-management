@@ -214,4 +214,9 @@ use App\Core\Utils\Strings\DateFormatter;
 
         window.location.href = basePath;
     });
+
+    const addOrderButton = document.getElementById('add-order');
+    addOrderButton.addEventListener('click', e => {
+        window.location.href = '/orders/create';
+    });
 </script>
