@@ -7,48 +7,8 @@ require_once __DIR__ . "/../../../vendor/autoload.php";
 
 use App\Data\Models\OrderModel;
 use App\Core\Utils\Strings\DateFormatter;
-
-function formatCurrency($amount)
-{
-    // ! the dutch (Germany) format is more close to the Malagasy format than the "mg-MG" itself
-    $formatter = new NumberFormatter(
-        "de-DE",
-        NumberFormatter::CURRENCY
-    );
-
-    // ! so we replace € to the actual currency
-    return str_replace(
-        "€",
-        OrderModel::CURRENCY_CODE,
-        $formatter->formatCurrency($amount, "EUR")
-    );
-}
-
-function formatDate(DateTime $date)
-{
-    $currentTimeZone = $_ENV["CURRENT_TIMEZONE_NAME"];
-
-    $formatter = new IntlDateFormatter(
-        'fr_FR',
-        IntlDateFormatter::FULL,
-        IntlDateFormatter::FULL,
-        $currentTimeZone,
-        IntlDateFormatter::GREGORIAN,
-        "dd MMM yyyy"
-    );
-
-    return $formatter->format($date);
-}
-
-function numberToText($number)
-{
-    $formatter = new NumberFormatter(
-        "fr",
-        NumberFormatter::SPELLOUT
-    );
-
-    return $formatter->format($number);
-}
+use App\Core\Utils\Strings\NumberToText;
+use App\Core\Utils\Strings\FormatCurrency;
 
 ?>
 
@@ -66,8 +26,9 @@ function numberToText($number)
     <!-- ! Need to add directly the bootstrap files (not links) here to apply style for the PDF -->
     <style>
         .bill-title {
-            font-weight: bold;
             text-align: center;
+            font-size: x-large;
+            margin-bottom: 3rem;
         }
 
         .table-container {
@@ -90,9 +51,43 @@ function numberToText($number)
             padding: 0.7rem;
         }
 
-        th,
-        td {
-            border: solid 2px #000;
+        .order-infos h2 {
+            font-size: larger;
+        }
+
+        .order-info {
+            font-weight: bold;
+        }
+
+        .table-head-row {
+            background-color: #263238;
+            color: #fff;
+        }
+
+        .table-head-cell {
+            border-right: solid 2px #fff;
+        }
+
+        .table-head-cell:last-of-type {
+            border-right: none;
+        }
+
+        .order-table-row:nth-child(2n + 1) {
+            background-color: #cfd8dc;
+        }
+
+        .total-text-cell {
+            background-color: #263238;
+            color: #fff;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 0.2rem;
+            border: solid 2px #263238;
+        }
+
+        .car-name {
+            font-weight: bold;
         }
 
         .cell-void {
@@ -115,6 +110,7 @@ function numberToText($number)
             padding: 1rem;
             font-weight: bold;
             text-align: right;
+            border: solid 2px #263238;
         }
 
         .total-text {
@@ -133,40 +129,48 @@ function numberToText($number)
     <div class="bill-container">
         <h1 class="bill-title">
             Facture :
-            <?= $order["id"] ?>
+            <span class="order-info"><?= $order["id"] ?></span>
         </h1>
 
-        <div>
+        <div class="order-infos">
             <h2>Date de facturation :
-                <?= DateFormatter::format($order["createdAt"]) ?>
+                <span class="order-info">
+                    <?= DateFormatter::format($order["createdAt"]) ?>
+                </span>
             </h2>
 
             <h2>Nom du client :
-                <?= $order["client"]["name"] ?>
+                <span class="order-info">
+                    <?= $order["client"]["name"] ?>
+                </span>
             </h2>
 
             <h2>Identifiant du client :
-                <?= $order["client"]["id"] ?>
+                <span class="order-info">
+                    <?= $order["client"]["id"] ?>
+                </span>
             </h2>
 
             <h2>Contact :
-                <?= $order["client"]["contact"] ?>
+                <span class="order-info">
+                    <?= $order["client"]["contact"] ?>
+                </span>
             </h2>
         </div>
 
         <div class="table-container">
             <table class="bill-table">
                 <thead>
-                    <tr>
-                        <th class="tg-j1i3">Désignation</th>
-                        <th class="tg-j1i3">Quantité</th>
-                        <th class="tg-j1i3">Prix Unitaire</th>
-                        <th class="tg-j1i3">Total</th>
+                    <tr class="table-head-row">
+                        <th class="table-head-cell">Désignation</th>
+                        <th class="table-head-cell">Quantité</th>
+                        <th class="table-head-cell">Prix Unitaire</th>
+                        <th class="table-head-cell">Total</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($order["carsQuantities"] as $carQuantity): ?>
-                        <tr>
+                    <?php foreach ($order["carsQuantities"] as $carQuantity) : ?>
+                        <tr class="order-table-row">
                             <td class="car-name">
                                 <?= $carQuantity["car"]["name"] ?>
                             </td>
@@ -174,19 +178,19 @@ function numberToText($number)
                                 <?= $carQuantity["quantity"] ?>
                             </td>
                             <td class="car-price">
-                                <?= formatCurrency($carQuantity["car"]["price"]) ?>
+                                <?= FormatCurrency::format($carQuantity["car"]["price"]) ?>
                             </td>
                             <td class="order-subtotal">
-                                <?= formatCurrency($carQuantity["subtotal"]) ?>
+                                <?= FormatCurrency::format($carQuantity["subtotal"]) ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>
-                    <tr>
+                    <tr class="total-table-row">
                         <td class="cell-void"></td>
                         <td class="cell-void"></td>
-                        <td class="cell-void"></td>
+                        <td class="total-text-cell">Total</td>
                         <td class="order-total">
-                            <?= formatCurrency($order["total"]) ?>
+                            <?= FormatCurrency::format($order["total"]) ?>
                         </td>
                     </tr>
                 </tbody>
@@ -195,7 +199,7 @@ function numberToText($number)
 
         <p>Arrêté par la présente facture à la somme de
             <span class="total-text">
-                <?= numberToText($order["total"]) ?>
+                <?= NumberToText::ToText($order["total"]) ?>
             </span>
             <?= OrderModel::CURRENCY_CODE ?>.
         </p>
