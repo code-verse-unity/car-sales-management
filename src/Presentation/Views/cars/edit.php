@@ -9,21 +9,21 @@
         <!-- To send put request -->
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Désignation de la voiture</label>
-            <input type="text" name="name" value=<?= $car['name'] ?> class="form-control p-3 rounded-3" id="exampleFormControlInput1" placeholder="Ferrari">
+            <input type="text" name="name" value="<?= $car['name'] ?>" class="form-control p-3 rounded-3" id="exampleFormControlInput1" placeholder="Ferrari">
             <div class="invalid-feedback">
                 Le nom de la voiture est obligatoire.
             </div>
         </div>
         <div class="mb-3">
             <label for="exampleFormControlInput1" class="form-label">Prix en Ariary</label>
-            <input type="number" name="price" value=<?= $car['price'] ?> class="form-control p-3 rounded-3" readonly id="exampleFormControlInput1" placeholder="50000000">
+            <input type="number" name="price" value="<?= $car['price'] ?>" class="form-control p-3 rounded-3" readonly id="exampleFormControlInput1" placeholder="50000000">
             <div class="invalid-feedback">
                 Veuillez entrer un prix correct.
             </div>
         </div>
         <div class="mb-3">
             <label for="stockNumber" class="form-label">Nombre en Stock</label>
-            <input type="number" name='inStock' value=<?= $car['inStock'] ?> class="form-control p-3 rounded-3" id="stockNumber" placeholder="10">
+            <input type="number" name='inStock' value="<?= $car['inStock'] ?>" class="form-control p-3 rounded-3" id="stockNumber" placeholder="10">
             <div class="invalid-feedback">
                 Veuillez indiquer le nombre de voitures disponible et il doit être supérieur à 0.
             </div>

@@ -57,7 +57,7 @@ class StoreOrderController
                 $response->setStatusCode(400);
 
                 $response->renderView(
-                    "orders/createOrderView",
+                    "orders/create",
                     [
                         "clients" => $clients,
                         "cars" => $cars,

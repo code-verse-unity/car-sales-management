@@ -1,16 +1,121 @@
-INSERT INTO cars (id, name, price, inStock) VALUES 
-  ('A7ZRqb95Ow4PYwglYdvel', 'Honda Civic', 22000000, 5),
-  ('A7ZRqb9gOw4kYwglYdvel', 'Ford Mustang', 35000000, 0),
-  ('A7ZRqb9gO84PYwglYdvel', 'Chevrolet Corvette', 65000000, 3),
-  ('A7Z1qb9gOw4oYwglYdvel', 'Tesla Model S', 80000000, 0),
-  ('A7rtqb9gOw4PYwglYdvel', 'BMW X3', 45000000, 2),
-  ('A7ZRqb9gOw4qawglYdvel', 'Audi A4', 40000000, 0),
-  ('A7ZRio9gOw4PY159Ydvel', 'Mercedes-Benz E-Class', 55000000, 4),
-  ('y15Rqb9guw4PYwglYdvel', 'Jeep Wrangler', 35000000, 8),
-  ('x89ZRqb9gOw4PYwglYdvel', 'Nissan Altima', 25000000, 6),
-  ('xeZRqb9gOw4PYwglYdvel', 'Toyota Highlander', 40000000, 0),
-  ('tyZRqb9gOw4PYwglYdvel', 'Porsche 911', 95000000, 0),
-  ('poZRqb9gOw4PYwglYdvel', 'Volvo XC60', 50000000, 2),
-  ('mkZRqb9gOw4PYwglYdvel', 'Cadillac Escalade', 80000000, 0),
-  ('rfZRqb9gOw4PYwglYdvel', 'Mazda CX-5', 30000000, 7),
-  ('rgZRqb9gOw4PYwglYdvel', 'Subaru Outback', 28000000, 0);
+INSERT INTO `cars`
+VALUES (
+    '3gz8WcuoyaTnV6Cilw6Dx',
+    'Audi A4',
+    40000000,
+    0,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    '3T0NAjY_ZS2bWMmGmwJfz',
+    'Nissan Altima',
+    25000000,
+    6,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    '4NU9H0jIIUUQs0XoYg0a8',
+    'Mercedes-Benz E-Class',
+    55000000,
+    4,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    '60acuLFcZLaN4Cp40a_Vu',
+    'Chevrolet Corvette',
+    65000000,
+    13,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    '8bKNeq_EM24UErIrSReUM',
+    'Tesla Model S',
+    80000000,
+    0,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'eGjfMkBO28nB5CABQ89yg',
+    'BMW X3',
+    45000000,
+    7,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'HxH_1ogO55kQHfE5Myo1N',
+    'Subaru Outback',
+    28000000,
+    0,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'kD3EMijlljTlt1FPbg7uI',
+    'Toyota Highlander',
+    40000000,
+    3,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'r8Bmd5uO8OUAgB_hMZ3vs',
+    'Volvo XC60',
+    50000000,
+    2,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'THmWU4vgwRcE8KA_oigny',
+    'Honda Civic',
+    22000000,
+    5,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'ukDaE9oEHICj4HQxWqrGa',
+    'Jeep Wrangler',
+    35000000,
+    8,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'uSHJzEeh3TuEDoIei1b5w',
+    'Mazda CX-5',
+    30000000,
+    7,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'V5272AwTHUWxbEjdMh9EE',
+    'Cadillac Escalade',
+    80000000,
+    0,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'w53L0KGGmKX6MWciUcC6I',
+    'Porsche 911',
+    95000000,
+    10,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  ),
+(
+    'YUnHUbxo7GYjb16uyGySF',
+    'Ford Mustang',
+    35000000,
+    4,
+    '2023-04-12 23:46:58',
+    '2023-04-12 23:46:58'
+  );

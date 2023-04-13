@@ -1,12 +1,11 @@
 <?php
 
+use App\Core\Utils\Strings\DateFormatter;
 ?>
-
-
 
 <main class="py-4">
     <div class="d-flex justify-content-between align-items-center">
-        <h1 class="fw-bold">Liste des <span class="text-orange">Achats</span> effectuées.</h1>
+        <h1 class="fw-bold">Liste des <span class="text-orange">Achats</span> effectués.</h1>
         <div>
             <button class="btn btn-primary" id='add-order'>Ajouter</button>
         </div>
@@ -17,8 +16,6 @@
             <div>
                 <label for="startAt" class="py-1">Début</label>
                 <input type="date" name="startAt" id="startAt" value="<?= $startAt ? $startAt->format("Y-m-d") : "" ?>" class="form-control">
-
-
             </div>
 
             <div>
@@ -31,111 +28,15 @@
             </div>
 
             <div class="align-self-end ml-2">
-                <a href="/orders">
-                    <button class="btn " type="button ">
-                        Effacer
-                    </button>
-                </a>
+                <button class="btn" type="button" id="remove-filters">
+                    Effacer
+                </button>
             </div>
         </form>
         <div class="invalid-feedback container ">
             Veuillez spécifier une date de début et de fin.
         </div>
     </div>
-
-
-
-    <script>
-        // ! this script only works because the form's method is GET, so we can use window.location.href
-        const startAt = document.getElementById("startAt");
-        const endAt = document.getElementById("endAt");
-        const form = document.getElementById("search");
-        const feedback = document.getElementsByClassName('invalid-feedback');
-        const basePath = "/orders";
-
-        startAt.addEventListener('input', (e) => {
-            if (e.target.value === '') {
-                startAt.classList.add("is-invalid");
-            } else {
-                startAt.classList.remove("is-invalid");
-                if (endAt.value !== '') {
-                    endAt.classList.remove("is-invalid");
-                    feedback[0].style.display = 'none';
-                }
-            }
-        })
-
-
-        endAt.addEventListener('input', (e) => {
-            if (e.target.value === '') {
-                endAt.classList.add("is-invalid");
-            } else {
-                endAt.classList.remove("is-invalid");
-                if (startAt.value !== '') {
-                    startAt.classList.remove("is-invalid");
-                    feedback[0].style.display = 'none';
-                }
-            }
-        })
-
-
-        form.addEventListener("submit", (event) => {
-            event.preventDefault();
-            const startAtValue = startAt.value;
-            const endAtValue = endAt.value;
-
-            const inputs = form.querySelectorAll("input");
-            Array.from(inputs).forEach(input => {
-                if (input.value === '') {
-                    input.classList.add("is-invalid");
-                }
-            })
-
-            const hasError = Array.from(inputs).some((input) => input.classList.contains("is-invalid"));
-
-            if (hasError) {
-                event.preventDefault();
-                feedback[0].style.display = 'block';
-            } else {
-                if (startAtValue && endAtValue) {
-                    const startAtDate = new Date(startAtValue);
-                    const endAtDate = new Date(endAtValue);
-
-                    if (startAtDate > endAtDate) {
-                        event.preventDefault();
-                        feedback[0].style.display = 'block';
-                        feedback[0].innerHTML = "La date de début doit être inférieure à la date de fin.";
-
-                        Array.from(inputs).forEach(input => {
-                            console.log('called');
-                            input.classList.add("is-invalid");
-                        })
-                        return;
-                    }
-                }
-
-
-                feedback[0].style.display = 'none';
-                let path = basePath + "?";
-
-                if (startAtValue) {
-                    path += `startAt=${startAtValue}&`;
-                }
-
-                if (endAtValue) {
-                    path += `endAt=${endAtValue}&`;
-                }
-
-                window.location.href = path;
-            }
-
-
-        });
-    </script>
-
-
-
-
 
     <?php if (empty($orders)) : ?>
         <?php if ($starAt || $endAt) : ?>
@@ -154,6 +55,7 @@
                 <div class="col">Nom du client</div>
                 <div class="col">Voitures</div>
                 <div class="col">Quantité</div>
+                <div class="col">Date</div>
                 <div class="col d-flex justify-content-end">Actions</div>
             </div>
             <?php foreach ($orders as $order) : ?>
@@ -169,6 +71,9 @@
                         <?php foreach ($order['quantities'] as $quantity) : ?>
                             <div class="mb-2"> <?= $quantity ?></div>
                         <?php endforeach; ?>
+                    </div>
+                    <div class="col pt-2">
+                        <?= DateFormatter::format($order["createdAt"]) ?>
                     </div>
                     <div class="col d-flex justify-content-end align-self-start">
                         <a href="<?= "/orders/" . $order['id'] . "/edit" ?>">
@@ -219,14 +124,99 @@
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-
-
 </main>
 
 <script>
+    // ! this script only works because the form's method is GET, so we can use window.location.href
+    const startAt = document.getElementById("startAt");
+    const endAt = document.getElementById("endAt");
+    const form = document.getElementById("search");
+    const removeFilters = document.getElementById("remove-filters");
+    const feedback = document.getElementsByClassName('invalid-feedback');
+    const basePath = "/orders";
+
+    startAt.addEventListener('input', (e) => {
+        if (e.target.value === '') {
+            startAt.classList.add("is-invalid");
+        } else {
+            startAt.classList.remove("is-invalid");
+            if (endAt.value !== '') {
+                endAt.classList.remove("is-invalid");
+                feedback[0].style.display = 'none';
+            }
+        }
+    })
+
+    endAt.addEventListener('input', (e) => {
+        if (e.target.value === '') {
+            endAt.classList.add("is-invalid");
+        } else {
+            endAt.classList.remove("is-invalid");
+            if (startAt.value !== '') {
+                startAt.classList.remove("is-invalid");
+                feedback[0].style.display = 'none';
+            }
+        }
+    })
+
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const startAtValue = startAt.value;
+        const endAtValue = endAt.value;
+
+        const inputs = form.querySelectorAll("input");
+        Array.from(inputs).forEach(input => {
+            if (input.value === '') {
+                input.classList.add("is-invalid");
+            }
+        })
+
+        const hasError = Array.from(inputs).some((input) => input.classList.contains("is-invalid"));
+
+        if (hasError) {
+            event.preventDefault();
+            feedback[0].style.display = 'block';
+        } else {
+            if (startAtValue && endAtValue) {
+                const startAtDate = new Date(startAtValue);
+                const endAtDate = new Date(endAtValue);
+
+                if (startAtDate > endAtDate) {
+                    event.preventDefault();
+                    feedback[0].style.display = 'block';
+                    feedback[0].innerHTML = "La date de début doit être inférieure à la date de fin.";
+
+                    Array.from(inputs).forEach(input => {
+                        console.log('called');
+                        input.classList.add("is-invalid");
+                    })
+                    return;
+                }
+            }
+
+            feedback[0].style.display = 'none';
+            let path = basePath + "?";
+
+            if (startAtValue) {
+                path += `startAt=${startAtValue}&`;
+            }
+
+            if (endAtValue) {
+                path += `endAt=${endAtValue}&`;
+            }
+
+            window.location.href = path;
+        }
+    });
+
+    removeFilters.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        window.location.href = basePath;
+    });
+
     const addOrderButton = document.getElementById('add-order');
     addOrderButton.addEventListener('click', e => {
-        console.log('c');
         window.location.href = '/orders/create';
-    })
+    });
 </script>

@@ -1,13 +1,14 @@
 <?php
 
 use App\Core\Utils\Strings\FormatCurrency;
+use App\Core\Utils\Strings\DateFormatter;
 ?>
 
 <main class="my-4">
     <div class="row">
         <div class="col-8 ">
             <div class="sticky-top">
-                <h1 class="fw-bold mb-4"><span class="text-orange">Recette</span> totale accumulé des <span class="text-orange">6 derniers mois</span>.</h1>
+                <h1 class="fw-bold mb-4"><span class="text-orange">Recette</span> totale accumulée des <span class="text-orange">6 derniers mois</span>.</h1>
                 <div class="bg-white p-3 rounded-3 shadow ">
                     <canvas id="myChart"></canvas>
                 </div>
@@ -16,15 +17,14 @@ use App\Core\Utils\Strings\FormatCurrency;
         <div class="col">
             <?php foreach ($revenuePerMonthForLast6Months as $dateAmount) : ?>
                 <div class="bg-white p-3 mb-3 rounded-3 shadow">
-                    <h6><?= $dateAmount["date"]->format("F Y") ?></h6>
+                    <h6><?= DateFormatter::format($dateAmount["date"], "MMMM yyyy") ?></h6>
                     <?php if ($dateAmount["amount"] === 0) : ?>
-                        <p class="text-secondary">Aucune vente effectué</p>
+                        <p class="text-secondary">Aucune vente effectuée</p>
                     <?php else : ?>
                         <p class="fw-bold fs-4 text-orange"><?= FormatCurrency::format($dateAmount["amount"]) ?></p>
                     <?php endif ?>
                 </div>
             <?php endforeach; ?>
-
         </div>
     </div>
 
@@ -35,7 +35,7 @@ use App\Core\Utils\Strings\FormatCurrency;
 <script>
     const ctx = document.getElementById('myChart');
 
-    const MONTHS = ['Janvier', 'Fevrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Aout', 'Septembre', 'Octobre', 'Novembre', 'Decembre']
+    const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
 
     const revenues = <?= json_encode($revenuePerMonthForLast6Months) ?>;
     const dates = revenues.map((revenue) => MONTHS[new Date(revenue.date.date).getMonth()]).reverse();
