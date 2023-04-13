@@ -44,7 +44,7 @@ class CreateOrderController
             $cars = $useCaseResult["cars"];
 
             $response->renderView(
-                "orders/createOrderView",
+                "orders/create",
                 [
                     "clients" => $clients,
                     "cars" => $cars,
