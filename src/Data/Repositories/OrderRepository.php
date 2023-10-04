@@ -73,6 +73,6 @@ class OrderRepository implements OrderRepositoryInterface
 
     public function getRevenuePerMonthByLastMonths(int $lastMonths): array
     {
-        return $this->source->getRevenuePerMonthByLastMonths();
+        return $this->source->getRevenuePerMonthByLastMonths($lastMonths);
     }
 }
