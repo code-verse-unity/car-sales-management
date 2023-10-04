@@ -13,6 +13,8 @@ interface OrderRepositoryInterface
     public function getCountByLastMonths(int $lastMonths): int;
     public function getRevenue(): int;
     public function getRevenueByLastMonths(int $lastMonths): int;
+    public function getRevenuePerMonth(): array;
+    public function getRevenuePerMonthByLastMonths(int $lastMonths): array;
     public function findByClientId(string $clientId): array;
     // public function findByCarId(string $carId): array; // require more time to implement and maybe not necessary
     public function save(string $id, string $clientId, array $orderCarsIds, array $carsIds, array $quantities, string $createdAt, string $updatedAt): void;
